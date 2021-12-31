@@ -1,6 +1,9 @@
 <html>
     <head>
         <style>
+            div{
+             background:#faabbc;
+            }
             #f1{
                 height:20%;
                 margin:10% 0 0 40%;
@@ -42,9 +45,90 @@
                 text-align:center;
 
             }
+            *{
+         margin:0;
+         padding:0;
+       }
+       section{
+         position: relative;
+         width:100%;
+         height:100%;
+         overflow: hidden;
+         background:#ff3561;
+       }
+       section .wave{
+         position:absolute;
+         bottom:0;
+         left:0;
+         width:100%;
+         height:90px;
+         background:url("wave.png");
+         background-size:1000px 100px; 
+       }
+       section .wave.w1{
+         animation: animate 20s linear infinite;
+         z-index: 1000;
+         opacity: 0.8;
+         animation-delay: -0.1s;
+         bottom:10;
+       }
+       @keyframes animate{
+         0%{
+           background-position-x: 0;
+         }
+         100%{
+           background-position-x: 1000px;
+         }
+       }
+       section .wave.w2{
+         animation: animate2 15s linear infinite;
+         z-index: 999;
+         opacity: 0.5;
+         animation-delay: -5s;
+         bottom:0;
+       }
+       @keyframes animate2{
+         0%{
+           background-position-x: 0;
+         }
+         100%{
+           background-position-x: 1000px;
+         }
+       }
+       section .wave.w3{
+         animation: animate3 5s linear infinite;
+         z-index: 998;
+         opacity: 0.2;
+         animation-delay: -3s;
+         bottom:10px;
+       }
+       @keyframes animate3{
+         0%{
+           background-position-x: 0;
+         }
+         100%{
+           background-position-x: 1000px;
+         }
+       }
+       section .wave.w4{
+         animation: animate2 15s linear infinite;
+         z-index: 997;
+         opacity: 0.7;
+         animation-delay: -5s;
+         bottom:20px;
+       }
+       @keyframes animate4{
+         0%{
+           background-position-x: 0;
+         }
+         100%{
+           background-position-x: 1000px;
+         }
+       }
         </style>
     </head>
-    <body>
+    <body>    
+        <section>      
      <div id="f1">
          <input type="text" placeholder="Enter Title" id="ntit"/><br>
          <input id='nop' type="number" placeholder="number of option you need"/><br>
@@ -59,7 +143,13 @@
      <div id='f3'>
          <h3 id='tit'></h3>
          <span></span>
-     </div>
+     </div>  
+     
+        <div class='wave w1'></div>
+        <div class='wave w2'></div>
+        <div class='wave w3'></div>
+        <div class='wave w4'></div>
+    </section>  
      <script>
          let f1 = document.getElementById("f1");
          let f2 = document.getElementById("f2");
