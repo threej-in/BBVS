@@ -1,6 +1,7 @@
 <html>
 <head>
-    <link rel="stylesheet" href="vot.css">
+    <link rel="stylesheet" href="theme/style/main.css">
+    <script src="theme/script/main.js"></script>
     <style>
     
       #f1{
