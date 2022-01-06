@@ -24,6 +24,9 @@ a{
     text-decoration: none;
     color: var(--grey);
 }
+a:hover{
+    color: var(--lblue);
+}
 body{
     scroll-behavior: smooth;
     font-family: 'Saira Condensed', sans-serif;
@@ -35,6 +38,23 @@ body.active .bar .head{
 body.active .headbox{
     margin-left:5%;
     width:1150px;
+}
+button{
+    position:relative;
+    border:none;
+    margin-top:5px;
+    color:#ff3561;
+    border-radius: 4px;
+    width: 100%;
+    padding: 10px;
+    cursor: pointer;
+}
+button:hover{
+    box-shadow: 0 0 5px grey;
+    text-shadow: 0 0 4px grey;
+}
+h1,h2,h3,h4,h5,h6{
+    margin-bottom: 5px;
 }
 header{
     height: 65px;
@@ -55,35 +75,30 @@ hr{
     margin: 10px 0;
 }
 input{
-    color:white;
-    margin-top:10px;
-    margin-bottom: 10px;
-    border:none;
     outline:none;
-    backdrop-filter:  blur(40px);
-    background-color:rgba(255,255,255,0); ;
-    border-bottom: 1px solid black;
+    width: 100%;
+    border: 1px solid grey;
+    padding: 10px;
+    border-radius: 5px;
+    color: var(--grey);
+    font-size: 16px;
 }
 input:focus{
     background:rgba(255,255,255,0.2);
 }
-input::placeholder{
-  color:white;
-}
-button{
-    position:relative;
-    border:none;
-    margin-top:5px;
-    width:50px;
-    height:25px;
-    color:#ff3561;
-    background:rgba(255,255,255,0.9);
-    border-radius: 5px;
-    box-shadow:5px 5px rgba(0,0,0,0.1)
+label{
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--grey);
+    display: block;
+    margin: 5px 0;
 }
 .blue{
     background-color: var(--blue);
     color: var(--white);
+}
+.bluetext{
+    color: var(--blue);
 }
 .black{
     color: var(--black);

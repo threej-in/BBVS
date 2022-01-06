@@ -1,5 +1,5 @@
 <?php
-require 'theme/header.php';
+require __DIR__.'/theme/header.php';
 ?>
 <style>
     div.banner{
@@ -45,7 +45,7 @@ require 'theme/header.php';
 <div class="banner">
     <div class="intro">
         <h1>Anonymous, Cheap, Simple & Secure Voting</h1>
-        <h4 class="description">Blockchain Based Voting System is designed to overcome all the limitations of traditional voting system.</h4>
+        <h4 class="description"><span class="blue">Blockchain Based Voting System</span> is designed to overcome all the limitations of traditional voting system.</h4>
     </div>
 </div>
 <span class="vspace" style="height: 150px;"></span>
@@ -138,5 +138,5 @@ require 'theme/header.php';
 <br>
 <br>
 <?php
-require 'theme/footer.php';
+require __DIR__.'/theme/footer.php';
 ?>
