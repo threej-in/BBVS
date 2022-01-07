@@ -6,6 +6,8 @@
   <base href="<?php echo HOMEURI?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <link rel="stylesheet" href="theme/style/main.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" ></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js" ></script>
   <script src="theme/script/main.js"></script>   
 </head>
 <body>

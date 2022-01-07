@@ -34,5 +34,6 @@
                 &copy; <?php echo date('Y', time())?> <a style="color:var(--white);" href="https://threej.in">threej.in</a>
             </div>
         </footer>
+              <script src="theme/script/main.js"></script>
     </body>
 </html>
