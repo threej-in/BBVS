@@ -22,18 +22,18 @@
     }
 </style>
 <div class="login-form">
-    <form action="#" method="POST" id="login">
+    <form action="page/login.php" method="POST" id="login">
         <div>
             <h2>Log In</h2>
-            <p class="sm">Don't have an account? Register <a href="/register.php" class="bluetext">here</a></p>
+            <p class="sm">Don't have an account? Register <a href="page/register.php" class="bluetext">here</a></p>
         </div>
         <section>
             <label for="loginid">Username or Email</label>
             <input type="text" name="loginid" id="loginid" placeholder="Enter your username or email address...">
         </section>
         <section>
-            <label for="loginid">Password</label>
-            <input type="password" name="password" id="password" placeholder="Enter your password">
+            <label for="loginid">Password <span style="float: right;color:grey;">Forgot Password?</span></label>
+            <input type="password" name="password" id="password" placeholder="Enter your password" required>
         </section>
         <button type="submit" class="blue">Login</button>
     </form>

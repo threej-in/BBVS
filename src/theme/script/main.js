@@ -5,13 +5,13 @@ menu.addEventListener("click",function(){
 })*/
 jQuery("#login").validate({
     rules:{
-      loginid:{
-          required:true
+        loginid:{
+            required:true
                     
-      },
-      password:{
-         minlength:8
-      }
+        },
+        password:{
+            minlength:8
+        }
     },
     messages:{
         loginid:{
@@ -23,15 +23,15 @@ jQuery("#login").validate({
         }
     },
     submitHandler:function(form){
-		form.submit();
+        form.submit();
     }
 });
 //not allow  use to enter the special charecters// 
 $('#loginid').on('keypress', function (event) {
-    var regex = new RegExp("^[a-zA-Z0-9]+$");
-    var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
-    if (!regex.test(key)) {
-       event.preventDefault();
-       return false;
-    }
+var regex = new RegExp("^[a-zA-Z0-9]+$");
+var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+if (!regex.test(key)) {
+    event.preventDefault();
+    return false;
+}
 });

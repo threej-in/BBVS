@@ -1,9 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+@font-face {
+    font-family: "Poppins";
+    src: url('../font/Poppins-Regular.ttf');
+}
 *{
     margin:0;
     padding:0;
     box-sizing: border-box;
-    font-family: Poppins, sans-serif;
+    font-family: Poppins;
     position: relative;
     word-spacing: 1.5px;
     line-height: 1.3em;
@@ -29,7 +32,6 @@ a:hover{
 }
 body{
     scroll-behavior: smooth;
-    font-family: 'Saira Condensed', sans-serif;
 }
 body.active .bar .head{
     margin:0;
