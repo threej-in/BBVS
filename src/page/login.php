@@ -1,5 +1,43 @@
 <?php
     require __DIR__.'/../theme/header.php';
+    if(isset($_SESSION['username'])){
+        header('Location: dashboard.php');        
+    }
+    $error = '';
+    if(isset($_POST['login'])){
+        isset($_POST['loginid']) && empty($_POST['loginid']) ? 
+        $error = 'Username or Email is required!': $loginid = $_POST['loginid'];
+
+        isset($_POST['password']) && empty($_POST['password']) ? 
+        $error = 'Password is required!': $password = $_POST['password'];
+        //verify captcha
+        isset($_POST['captcha']) && empty($_POST['captcha']) ? 
+        $error = 'Invalid captcha!': ($t->validateCaptcha($_POST['captcha']) ? :$error = 'Invalid captcha!');
+
+        strlen($password) < 8 ? $error = 'Password must contain atleast 8 characters.':'';
+        if($error == ''){
+            
+            $values = [
+                [&$loginid,'s']
+            ];
+            if($t->strValidate($loginid, 'email')){
+                $result = $t->query('SELECT USERNAME from BBVSUSERTABLE WHERE EMAIL = ? AND PASSWORD = ?', $values);
+            }else{
+                $result = $t->query('SELECT USERNAME,PASSWORD from BBVSUSERTABLE WHERE USERNAME = ?', $values);
+            }
+            if(false !== $result){
+                $t->execute();
+                if($t->affected_rows == 1){
+                    $result = $t->fetch();
+                    if(password_verify($password,$result['PASSWORD'])){
+                        $_SESSION['username'] = $result['USERNAME'];
+                        header('Location: dashboard.php');
+                    }
+                }
+            }
+            $error ='Login failed! Invalid credentials';
+        }
+    }
 ?>
 <style>
     .login-form{
@@ -32,10 +70,18 @@
             <input type="text" name="loginid" id="loginid" placeholder="Enter your username or email address...">
         </section>
         <section>
-            <label for="loginid">Password <span style="float: right;color:grey;">Forgot Password?</span></label>
+            <label for="password">Password <span style="float: right;color:grey;">Forgot Password?</span></label>
             <input type="password" name="password" id="password" placeholder="Enter your password" required>
         </section>
-        <button type="submit" class="blue">Login</button>
+        <section>
+            <label for="captcha">Captcha</label>
+            <div class="flexrow">
+                <input style="min-width:50%;max-width:60%;" type="text" name="captcha" id="captcha" placeholder="Enter text as shown in image" required>
+                <img style="border: 1px solid grey;border-radius:5px;" src="<?php echo $t->getCaptcha();?>">
+            </div>
+        </section>
+        <p class="red sm"><?php echo $error ?></p>
+        <button type="submit" name="login" class="blue">Login</button>
     </form>
 </div>
 <?php

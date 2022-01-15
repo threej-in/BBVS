@@ -9,13 +9,19 @@
         $basedir . '/' . preg_replace('#.*/'.$basedir.'/#','',ROOTDIR)
     );
 
+    define('DEBUGGING',true);
+
     //database details
     //specify server name
-    define('SERVER', $_SERVER['SERVER_NAME']);
+    $SERVER = $_SERVER['SERVER_NAME'];
     //specify database name
-    define('DATABASE','');
+    $DATABASE = 'bbvs';
     //Enter db username
-    define('DBUSER','root');
+    $DBUSER = 'root';
     //Enter db password
-    define('DBPASS','');
+    $DBPASS = '';
+
+    //salt
+    $SALT = 'fqubf3bf9021fcaocer13rf3298bf4nfw498nf34';
+    
 ?>

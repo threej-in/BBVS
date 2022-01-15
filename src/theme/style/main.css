@@ -108,6 +108,9 @@ label{
 .dark{
     color: var(--dark);
 }
+.red{
+    color: red;
+}
 .white{
     background-color: var(--white);
     color: var(--dark);

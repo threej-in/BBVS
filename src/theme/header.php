@@ -1,5 +1,5 @@
 <?php
-  require __DIR__.'/../class/db.php';
+  require __DIR__.'/../class/threej.php';
 ?>
 <html>
 <head>
@@ -22,7 +22,12 @@
     </div>
     <ul class="flexrow">
       <li><a href="#"><b>About</b></a></li>
-      <li><a href="page/login.php"><b>Login</b></a></li>
+      <?php 
+        echo isset($_SESSION['username']) ? 
+        '<li><a href="page/logout.php"><b><i class="fa fa-sign-out-alt fa-sm"></i> Logout</b></a></li>':
+        '<li><a href="page/login.php"><b><i class="fa fa-sign-in-alt fa-sm"></i> Login</b></a></li>';
+      ?>
+      
     </ul>
   </header>
 <main style="padding: 30px;">
