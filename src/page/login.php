@@ -21,22 +21,29 @@
                 [&$loginid,'s']
             ];
             if($t->strValidate($loginid, 'email')){
-                $result = $t->query('SELECT USERNAME from BBVSUSERTABLE WHERE EMAIL = ? AND PASSWORD = ?', $values);
+                $result = $t->query('SELECT USERNAME,PASSWORD,ROLE from BBVSUSERTABLE WHERE EMAIL = ? AND PASSWORD = ?', $values);
             }else{
-                $result = $t->query('SELECT USERNAME,PASSWORD from BBVSUSERTABLE WHERE USERNAME = ?', $values);
+                $result = $t->query('SELECT USERNAME,PASSWORD,ROLE from BBVSUSERTABLE WHERE USERNAME = ?', $values);
             }
             if(false !== $result){
                 $t->execute();
                 if($t->affected_rows == 1){
                     $result = $t->fetch();
-                    if(password_verify($password,$result['PASSWORD'])){
+                    if(password_verify(($password),$result['PASSWORD'])){
                         $_SESSION['username'] = $result['USERNAME'];
+                        $_SESSION['role'] = $result['ROLE'];
                         header('Location: dashboard.php');
                     }
                 }
             }
             $error ='Login failed! Invalid credentials';
         }
+    }
+    $passResetForm = 0;
+    isset($_GET['req']) && $_GET['req'] == 'reset-password' ? $passResetForm = 1 : 0;
+
+    if(isset($_POST['resetPassword'])){
+        
     }
 ?>
 <style>
@@ -59,20 +66,68 @@
         font-size:14px;
     }
 </style>
+<script>
+    function fetchdata(e){
+        if(e.value == ''){
+            $('#error').text('Login id cannot be empty');
+            return;
+        }
+        $.post(
+            'ajax/user.php',
+            {
+                req : 'securityQuestion',
+                loginid : e.value
+            },
+            (result)=>{
+                console.log(result)
+                if(result != false){
+                    $('#error').text('')
+                    $('[class=hide]').removeClass('hide');
+                    result = $.parseJSON(result)
+                    $('label[for=question]').text(result.question)
+                }else{
+                    $('#error').text('Login id not found');
+                }
+            }
+        )
+    }
+</script>
 <div class="login-form">
     <form action="page/login.php" method="POST" id="login">
         <div>
-            <h2>Log In</h2>
-            <p class="sm">Don't have an account? Register <a href="page/register.php" class="bluetext">here</a></p>
+            <?php 
+                echo $passResetForm 
+                ?
+                    '<h2>Reset Password</h2>' 
+                :
+                    '<h2>Log In</h2>
+                    <p class="sm">Don\'t have an account? Register <a href="page/register.php" class="bluetext">here</a></p>'
+                ;
+            ?>
         </div>
         <section>
-            <label for="loginid">Username or Email</label>
-            <input type="text" name="loginid" id="loginid" placeholder="Enter your username or email address...">
+            <label for="loginid"><?php echo $passResetForm ? 'Enter your email or username':'Username or Email'?></label>
+            <input type="text" onblur="fetchdata(this)" name="loginid" id="loginid" value="<?php echo $_POST['loginid'] ?? '' ?>" placeholder="Enter your login Id">
         </section>
-        <section>
-            <label for="password">Password <span style="float: right;color:grey;">Forgot Password?</span></label>
-            <input type="password" name="password" id="password" placeholder="Enter your password" required>
-        </section>
+    <?php 
+        echo $passResetForm 
+        ?
+            '<section class="hide">
+                <label for="question"></label>
+                <input type="text" name="answer" id="answer" placeholder="Enter your answer" required>
+            </section>
+            <section class="hide">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" placeholder="Enter new password" required>
+            </section>'
+        :
+            '<section>
+                <label for="password">Password <span style="float: right;color:grey;"><a href="page/login.php?req=reset-password">Forgot Password?</a></span></label>
+                <input type="password" name="password" id="password" placeholder="Enter your password" required>
+            </section>'
+        ;
+    ?>
+        
         <section>
             <label for="captcha">Captcha</label>
             <div class="flexrow">
@@ -80,8 +135,8 @@
                 <img style="border: 1px solid grey;border-radius:5px;" src="<?php echo $t->getCaptcha();?>">
             </div>
         </section>
-        <p class="red sm"><?php echo $error ?></p>
-        <button type="submit" name="login" class="blue">Login</button>
+        <p class="red sm" id="error"><?php echo $error ?></p>
+        <button type="submit" name="<?php echo $passResetForm ?'reset-password':'login' ?>" class="blue"><?php echo $passResetForm ?'Reset Password':'Login' ?></button>
     </form>
 </div>
 <?php

@@ -28,7 +28,7 @@ a{
     color: var(--grey);
 }
 a:hover{
-    color: var(--lblue);
+    color: var(--blue);
 }
 body{
     scroll-behavior: smooth;
@@ -56,7 +56,7 @@ button:hover{
     text-shadow: 0 0 4px grey;
 }
 h1,h2,h3,h4,h5,h6{
-    margin-bottom: 5px;
+
 }
 header{
     height: 65px;
@@ -76,7 +76,7 @@ hr{
     border: none;
     margin: 10px 0;
 }
-input{
+input, select{
     outline:none;
     width: 100%;
     border: 1px solid grey;
@@ -84,8 +84,10 @@ input{
     border-radius: 5px;
     color: var(--grey);
     font-size: 16px;
+    margin: 5px 0;
 }
-input:focus{
+select{padding: 7px;}
+input:focus, select:focus{
     background:rgba(255,255,255,0.2);
 }
 label{
@@ -183,4 +185,6 @@ label{
     background-color: transparent;
     display: block;
 }
-
+.hide{
+    display: none;
+}

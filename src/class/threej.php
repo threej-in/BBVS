@@ -14,6 +14,7 @@ class threej extends threejdb{
     public 
     
     function __construct() {
+
         $this->salt = $GLOBALS['SALT'];
         if(session_status() < 2) session_start();
         //error reporting
@@ -24,6 +25,29 @@ class threej extends threejdb{
         if(false === $this->newDatabaseConnection()){
             $this->error($this->dberror,'Database connection failed');
             die;
+        }
+    }
+    /**
+     * @param string $str String for adding salt to it
+     * @param integer $start_or_end specify the location where you want to add the salt
+     * - 1 for start [default]
+     * - 2 for end 
+     * - 3 for adding salt on both end
+     * @return string|false Salted string or false if wrong positon choosed.
+     */
+    function addSalt($str, $start_or_end=1){
+        switch($start_or_end){
+            case 1:
+                return $this->salt . $str;
+            break;
+            case 2:
+                return $str . $this->salt;
+            break;
+            case 3:
+                return $this->salt . $str . $this->salt;
+            break;
+            default:
+                return false;
         }
     }
     /**
@@ -64,6 +88,7 @@ class threej extends threejdb{
     function validateCaptcha($str){
         return preg_match('/'.$_SESSION['captcha'].'/i', $str);
     }
+    
     //see output
     function print($data){
         ob_start();

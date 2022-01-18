@@ -23,5 +23,5 @@
 
     //salt
     $SALT = 'fqubf3bf9021fcaocer13rf3298bf4nfw498nf34';
-    
+
 ?>

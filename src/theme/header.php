@@ -1,5 +1,6 @@
 <?php
   require __DIR__.'/../class/threej.php';
+  require ROOTDIR .'class/settings.php';
 ?>
 <html>
 <head>
@@ -7,10 +8,37 @@
   <link rel="stylesheet" href="theme/style/brands.min.css">
   <link rel="stylesheet" href="theme/style/fontawesome.min.css">
   <link rel="stylesheet" href="theme/style/main.css">
+  <link rel="shortcut icon" href="theme/img/logo.png" type="image/png">
   <script src="theme/script/brands.min.js"></script>
   <script src="theme/script/fontawesome.min.js"></script>
   <script rel="preload" as="script" src="theme/script/jquery-3.6.0.min.js"></script>
   <script src="theme/script/main.js"></script>
+  <style>
+    header span.profile{
+      border-radius:10px 10px 0 0;
+      display:flex;
+      padding-right:10px;
+      column-gap: 10px;
+      padding: 10px;
+    }
+    header span.profile:hover{
+      background-color: #e3e3e3;
+      cursor: pointer;
+    }
+    header span.profile:hover li.dropdown{
+      display: block;
+    }
+    li.dropdown{
+      display: none;
+      position: absolute;
+      top: calc(100% - 0%);
+      background-color: #e3e3e3;
+      width: 100%;
+      padding: 15px 0 20px 17px;
+      border-radius: 0 0 10px 10px;
+      left: 0px;
+    }
+  </style>
 </head>
 <body>
   <header class="flexrow white">
@@ -21,13 +49,14 @@
       </a>
     </div>
     <ul class="flexrow">
-      <li><a href="#"><b>About</b></a></li>
       <?php 
         echo isset($_SESSION['username']) ? 
-        '<li><a href="page/logout.php"><b><i class="fa fa-sign-out-alt fa-sm"></i> Logout</b></a></li>':
-        '<li><a href="page/login.php"><b><i class="fa fa-sign-in-alt fa-sm"></i> Login</b></a></li>';
+        '<span class="flexacc profile">
+        <a href="page/dashboard.php" class="flexrow flexacc" style="column-gap:10px;"><img src="theme/img/boy.jpg" class="brad50" style="border:1px solid grey;" height="35px" width="35px" />'.$_SESSION['username'].'</a>
+        <li class="dropdown"><a href="page/logout.php"><i class="fa fa-sign-out-alt fa-lg" style="padding-right:5px"></i> Log out</a></li></span>':
+        '<li><a href="page/login.php"><i class="fa fa-sign-in-alt fa-sm"></i> Log In</a></li>';
       ?>
-      
+      <li><a href="#">About</a></li>
     </ul>
   </header>
 <main style="padding: 30px;">

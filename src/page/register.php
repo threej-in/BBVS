@@ -23,7 +23,7 @@
             $t->strValidate($email,'email') ? : $error = 'Please enter a valid email address.';            
             strlen($password) < 8 ? $error = 'Please choose a strong password.<br>Required password length is 8':'';
             if($error == ''){
-                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                $hashed_password = password_hash($t->addSalt($password), PASSWORD_DEFAULT);
                 unset($password);
                 $time = time();
                 $values = [
