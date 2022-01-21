@@ -90,6 +90,10 @@ select{padding: 7px;}
 input:focus, select:focus{
     background:rgba(255,255,255,0.2);
 }
+input:disabled{
+    border: none;
+    color: grey;
+}
 label{
     font-size: 14px;
     font-weight: 700;
@@ -112,6 +116,9 @@ label{
 }
 .red{
     color: red;
+}
+.green{
+    color:seagreen;
 }
 .white{
     background-color: var(--white);

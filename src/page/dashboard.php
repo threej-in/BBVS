@@ -1,22 +1,10 @@
 <?php
-//dashboard page
-include __DIR__.'/../theme/header.php';
-
-if(isset($_POST['updateprofile'])){
-    $answer = password_hash($_POST['securityAnswer'], PASSWORD_DEFAULT);
-    $param = [
-        [&$_POST['securityQuestion'] , 'i'],
-        [&$answer, 's'],
-        [&$_SESSION['username'],'s']
-    ];
-    $t->query('UPDATE BBVSUSERTABLE SET SECURITYQUESTION = ?, SECURITYANSWER = ? WHERE USERNAME = ?', $param);
-    $t->execute();
-}
-
-$t->query('SELECT * FROM BBVSUSERTABLE WHERE USERNAME = ?', [[&$_SESSION['username'],'s']]);
-if(false != $t->execute()){
-    $user = $t->fetch();
-}
+    //dashboard page
+    include __DIR__.'/../theme/header.php';
+    $t->query('SELECT * FROM BBVSUSERTABLE WHERE USERNAME = ?', [[&$_SESSION['username'],'s']]);
+    if(false != $t->execute()){
+        $user = $t->fetch();
+    }
 ?>
 <style>
     div.sidebar{
@@ -26,6 +14,9 @@ if(false != $t->execute()){
         margin: -30px;
         padding: 20px 0 20px 30px;
         margin-right: 0;
+        height: 95vh;
+        position: sticky;
+        top: 65px;
     }
     div.sidebar ul{width: 100%;}
     div.sidebar li{
@@ -65,18 +56,11 @@ if(false != $t->execute()){
         font-size:14px;
     }
 </style>
-<script>
-    $(()=>{
-        $('div.sidebar ul li').on('click',(e)=>{
-            $('div.sidebar ul li').removeClass('active');
-            $(e.target).addClass('active');
-        })
-    })
-</script>
+<script src="theme/script/dashboard.js"></script>
 <div class="flexrow flexass">
     <div class="sidebar flexcol flexass">
         <div class="flexrow" style="margin: 40px 0;">
-            <img src="<?php echo 'theme/img/boy.jpg' ?>" alt="" style="box-shadow: 0 0 2px 2px lightgrey;" class="brad50" width="70" height="70">
+            <img data-id="profilepic" src="<?php echo 'theme/img/boy.jpg' ?>" alt="" style="box-shadow: 0 0 2px 2px lightgrey;" class="brad50" width="70" height="70">
             <div class="flexcol" style="row-gap: 0;">
                 <h4 class="lg"><?php echo $user['NAME']?></h4>
                 <h5 style="color:grey;" class="sm">@<?php echo $user['USERNAME']?></h5>
@@ -94,34 +78,12 @@ if(false != $t->execute()){
                     echo '<li><i class="fa fa-sliders-h fa-xs"></i> Polls Management</li>';
                 }
             ?>
-            <li><i class="fa fa-cog fa-xs"></i> Account Settings</li>
+            <li onclick="showProfile()"><i class="fa fa-cog fa-xs"></i> Account Settings</li>
         </ul>
         <hr style="height:50px;">
     </div>
-    <div class="content">
-        <form action="page/dashboard.php" method="POST">
-            <section>
-                <label for=""></label>
-                <input type="text">
-            </section>
-            <section>
-                <label for="securityQuestion">Change security question</label>
-                <?php
-                    echo '<select name="securityQuestion" id="">';
-                    foreach(SETTINGS::securityQuestion as $k=> $q){
-                        echo $user['SECURITYQUESTION'] == $k 
-                        ?
-                        '<option value="'.$k.'" selected>'.$q.'</option>'
-                        :
-                        '<option value="'.$k.'">'.$q.'</option>'
-                        ;
-                    }
-                    echo '</select>';
-                ?>
-                <input type="text" name="securityAnswer" placeholder="Your answer">
-            </section>
-            <button class="blue" type="submit" name="updateprofile">Update profile</button>
-        </form>
+    <div class="content" id="contentArea">
+        
     </div>
 </div>
 <?php
