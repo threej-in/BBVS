@@ -21,7 +21,7 @@
                 [&$loginid,'s']
             ];
             if($t->strValidate($loginid, 'email')){
-                $result = $t->query('SELECT USERNAME,PASSWORD,ROLE from BBVSUSERTABLE WHERE EMAIL = ? AND PASSWORD = ?', $values);
+                $result = $t->query('SELECT USERNAME,PASSWORD,ROLE from BBVSUSERTABLE WHERE EMAIL = ?', $values);
             }else{
                 $result = $t->query('SELECT USERNAME,PASSWORD,ROLE from BBVSUSERTABLE WHERE USERNAME = ?', $values);
             }
@@ -134,7 +134,7 @@
             </div>
             <section>
                 <label for="loginid"><?php echo $passResetForm ? 'Enter your email or username':'Username or Email'?></label>
-                <input type="text" onblur="fetchdata(this)" name="loginid" id="loginid" value="<?php echo $_POST['loginid'] ?? '' ?>" placeholder="Enter your login Id">
+                <input type="text" <?php echo $passResetForm ? 'onblur="fetchdata(this)"':0;?> name="loginid" id="loginid" value="<?php echo $_POST['loginid'] ?? '' ?>" placeholder="Enter your login Id">
             </section>
         <?php 
             echo $passResetForm 

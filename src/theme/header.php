@@ -50,10 +50,28 @@
     </div>
     <ul class="flexrow">
       <?php 
+        if(isset($_SESSION['username'])){
+          $pp = 'contents/img/profilepic/'.$_SESSION['username'];
+          is_file(ROOTDIR.$pp.'.jpg') 
+          ? $pp = $pp.'.jpg' 
+          : (is_file(ROOTDIR.$pp.'.jpeg') 
+            ? $pp = $pp.'.jpeg' 
+            : (is_file(ROOTDIR.$pp.'.png') 
+              ? $pp = $pp.'.png' 
+              : $pp = 'contents/img/profilepic/boy.jpg'))
+          ;
+        }
         echo isset($_SESSION['username']) ? 
         '<span class="flexacc profile">
-        <a href="page/dashboard.php" class="flexrow flexacc" style="column-gap:10px;"><img src="theme/img/boy.jpg" class="brad50" style="border:1px solid grey;" height="35px" width="35px" />'.$_SESSION['username'].'</a>
-        <li class="dropdown"><a href="page/logout.php"><i class="fa fa-sign-out-alt fa-lg" style="padding-right:5px"></i> Log out</a></li></span>':
+          <a href="page/dashboard.php" class="flexrow flexacc" style="column-gap:10px;">
+            <img src="'.$pp.'" class="brad50" style="border:1px solid grey;" height="35px" width="35px" />'.$_SESSION['username'].'
+          </a>
+          <li class="dropdown">
+            <a href="page/logout.php">
+              <i class="fa fa-sign-out-alt fa-lg" style="padding-right:5px"></i> Log out
+            </a>
+          </li>
+        </span>':
         '<li><a href="page/login.php"><i class="fa fa-sign-in-alt fa-sm"></i> Log In</a></li>';
       ?>
       <li><a href="#">About</a></li>

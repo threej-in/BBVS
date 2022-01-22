@@ -17,6 +17,7 @@
         height: 95vh;
         position: sticky;
         top: 65px;
+        flex-wrap: nowrap;
     }
     div.sidebar ul{width: 100%;}
     div.sidebar li{
@@ -60,7 +61,7 @@
 <div class="flexrow flexass">
     <div class="sidebar flexcol flexass">
         <div class="flexrow" style="margin: 40px 0;">
-            <img data-id="profilepic" src="<?php echo 'theme/img/boy.jpg' ?>" alt="" style="box-shadow: 0 0 2px 2px lightgrey;" class="brad50" width="70" height="70">
+            <img data-id="profilepic" src="contents/img/profilepic/<?php echo $user['IMAGE'] ?>" alt="" style="box-shadow: 0 0 2px 2px lightgrey;" class="brad50" width="70" height="70">
             <div class="flexcol" style="row-gap: 0;">
                 <h4 class="lg"><?php echo $user['NAME']?></h4>
                 <h5 style="color:grey;" class="sm">@<?php echo $user['USERNAME']?></h5>

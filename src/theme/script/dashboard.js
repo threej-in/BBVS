@@ -50,9 +50,15 @@ function validateImage(img, upload = false){
             processData:false,
             data : fd,
             success: function(result){
-                console.log(result)
+                r = JSON.parse(result)
+                if(r['result']){
+                    alert(r['message']);
+                }else{
+                    alert(r['error'])
+                }
             },
             error: function(error) {
+                alert('Failed to uplaod image!')
                 console.log(error);
             }
         });
@@ -70,12 +76,23 @@ function updateProfile(){
     payload = {
         req : 'updateProfile',
         name : fname,
-        question : question,
-        answer : answer
+        securityQuestion : question,
+        securityAnswer : answer
     }
     $.ajax({
         url : 'ajax/user.php',
         type : 'post',
-        
+        data : payload,
+        success : (result)=>{
+            r = JSON.parse(result)
+            if(r['result']){
+                alert(r['message']);
+            }else{
+                alert(r['error'])
+            }
+        },
+        error : (error)=>{
+            console.log(error)
+        }
     })
 }

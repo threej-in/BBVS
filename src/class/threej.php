@@ -105,35 +105,50 @@ class threej extends threejdb{
      * string validation
      * @param string $str string to validate
      * @param string|array $allowed_char Array of named constants for allowed characters
-     * - alphanum for a-zA-Z0-9
-     * - alpha for a-z
-     * - ALPHA for A-Z
-     * - num for 0-9
-     * - @ for special characters
+     * - c for ascii characters
+     * - d for digits
+     * - w for words/characters, digits and underscore
+     * - @ for special char
+     * - !c to exclude ascii characters
+     * - !d to exclude digits
+     * - !w to exclude words/characters/digits
+     * - !@ to exclude special characters
      * - email to validate email address
      * @param string $not_allowed_char list of character that are not allowed
      * @return boolean
      */
-    function strValidate($str, $allowed_char='', $not_allowed_char=''){
-        $result = false;
+    function strValidate($str, $option=''){
         if(!is_string($str)){
             return false;
         }
-        if($allowed_char != ''){
-            switch($allowed_char){
+        if($option != ''){
+            switch($option){
                 case 'email':
                     return preg_match('/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$/i', $str);
                 break;
-            }
-        }
-        if($not_allowed_char != ''){
-            switch($not_allowed_char){
+                case 'c':
+                    return preg_match('/^[a-z|A-Z]+$/',$str);
+                break;
+                case 'd':
+                    return preg_match('/^[0-9]+$/',$str);
+                break;
+                case 'w':
+                case '!@':
+                case '!w':
+                    return preg_match('/^\w+$/',$str);
+                break;
                 case '@':
-                    return !preg_match('/[\W]+/', $str);
+                    return preg_match('/^\W+$/',$str);
+                break;
+                
+                case '!c':
+                    return preg_match('/^[\W0-9_]+$/',$str);
+                break;
+                case '!d':
+                    return preg_match('/^\D+$/',$str);                    
                 break;
             }
         }
-        
     }
 }
 

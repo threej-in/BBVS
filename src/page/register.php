@@ -26,7 +26,7 @@
         // $error = 'Invalid captcha!': ($t->validateCaptcha($_POST['captcha']) ? :$error = 'Invalid captcha!');
 
         if($error == ''){
-            $t->strValidate($username,'','@') ? : $error = 'Special characters are not allowed in username';
+            $t->strValidate($username,'!@') ? : $error = 'Special characters are not allowed in username';
             $t->strValidate($email,'email') ? : $error = 'Please enter a valid email address.';            
             strlen($password) < 8 ? $error = 'Please choose a strong password.<br>Required password length is 8':'';
 
