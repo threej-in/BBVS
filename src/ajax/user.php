@@ -11,6 +11,7 @@
                 if(false !== $t->execute()){
                     $user = $t->fetch();
                 ?>
+                <h3 style="color: var(--grey);">Profile settings</h3><hr>
                 <form action="page/dashboard.php" method="POST" enctype="multipart/form-data">
                     <section>
                         <img data-id="profilepic" src="<?php echo empty($user['IMAGE']) ? 'theme/img/boy.jpg' : 'contents/img/profilepic/'.$user['IMAGE'] ?>" alt="" width="150px" height="150px">
@@ -179,6 +180,131 @@
                     }   
                 }
                 echo json_encode(['result'=>false, 'error'=>'internal error occured']);
+            break;
+            case 'userManagement':
+                if($_SESSION['role'] !== USERROLE::ADMIN) return;
+                
+                $t->query('SELECT * FROM BBVSUSERTABLE WHERE USERNAME NOT LIKE ? LIMIT 50',[[&$_SESSION['username'],'s']]);
+                $t->execute();
+                
+                echo '
+                    <h3 style="color: var(--grey);text-align:center;">User management</h3><hr style="height:25px;">
+                    <ul class="info">
+                        <li>You can promote users and moderators</li>
+                        <li>You can remove users and moderators but not other admins</li>
+                        <li>You can demote moderators but they cannot demote other admins</li>
+                        <li>You can change status of users and moderators</li>
+                    </ul>
+                    <hr>
+                    <table>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Username</th>
+                            <th>Status</th>
+                            <th>Role</th>
+                            <th>Reg Date</th>
+                            <th>Action</th>
+                        </tr>';
+                $i=1;
+                $userRole = [
+                    2 => 'Admin',
+                    3 => 'Moderator',
+                    4 => 'User'
+                ];
+                $userStatus = [
+                    2 => 'Active',
+                    3 => 'On hold',
+                    4 => 'Banned'
+                ];
+                while($r = $t->fetch()){
+                ?>
+                    <tr>
+                        <td><?php echo $i++ ?></td>
+                        <td><?php echo $r['NAME'] ?></td>
+                        <td>@<?php echo $r['USERNAME'] ?></td>
+                        <td>
+                            <select name="status">
+                                <?php
+                                    foreach($userStatus as $k => $v){
+                                        if($r['STATUS'] == $k)
+                                            echo '<option value="'.$k.'" selected>'.$v.'</option>';
+                                        else
+                                            echo '<option value="'.$k.'">'.$v.'</option>';
+                                    }
+                                ?>
+
+                            </select>
+                        </td>
+                        <td>
+                            <select name="role">
+                                <?php
+                                    foreach($userRole as $k => $v){
+                                        if($r['ROLE'] == $k)
+                                            echo '<option value="'.$k.'" selected>'.$v.'</option>';
+                                        else
+                                            echo '<option value="'.$k.'">'.$v.'</option>';
+                                    }
+                                ?>
+
+                            </select>
+                        </td>
+                        <td><?php echo date('d M Y',$r['REGDATE']) ?></td>
+                        <td>
+                            <button style="color: seagreen;" onclick="updateUser(this)" data-uid="<?php echo $r['UID']?>">Update</button>
+                            <button onclick="removeUser(this)" data-uid="<?php echo $r['UID']?>">Remove</button>
+                        </td>
+                    </tr>
+                    
+                <?php
+                }
+                echo '</table>';
+                return;
+            break;
+            case 'removeUser':
+                if($_SESSION['role'] == USERROLE::ADMIN){
+                    $t->query('DELETE FROM BBVSUSERTABLE WHERE UID = ? && (ROLE = ? || ROLE = ?)',
+                    [
+                        [&$_POST['uid'],'i'],
+                        [USERROLE::MODERATOR,'i'],
+                        [USERROLE::USER,'i']
+                    ]);
+                    if(false !== $t->execute() && $t->affected_rows == 1){
+                        echo json_encode([
+                            'result' => true,
+                            'message' => 'User removed'
+                        ]);
+                        return;
+                    }
+                }
+                echo json_encode([
+                    'result' => false,
+                    'message' => 'Failed to remove user'
+                ]);
+                return;
+            break;
+            case 'updateUser':
+                if($_SESSION['role'] == USERROLE::ADMIN){
+                    $t->query('UPDATE BBVSUSERTABLE SET STATUS = ?, ROLE = ? WHERE UID = ? AND ROLE <> ?',
+                    [
+                        [&$_POST['status'],'i'],
+                        [&$_POST['role'],'i'],
+                        [&$_POST['uid'],'i'],
+                        [USERROLE::ADMIN,'i'],
+                    ]);
+                    if(false !== $t->execute() && $t->affected_rows == 1){
+                        echo json_encode([
+                            'result' => true,
+                            'message' => 'User role, status updated successfuly'
+                        ]);
+                        return;
+                    }
+                }
+                echo json_encode([
+                    'result' => false,
+                    'message' => 'Failed to update user'
+                ]);
+                return;
             break;
         }
     }

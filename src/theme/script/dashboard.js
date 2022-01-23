@@ -96,3 +96,69 @@ function updateProfile(){
         }
     })
 }
+
+function showUsers(){
+    $.post(
+        'ajax/user.php',{ req : 'userManagement' },
+        (result)=>{
+            $('#contentArea').html(result);
+        }
+    )
+}
+
+function removeUser(e){
+    uid = $(e).attr('data-uid')
+    if(uid > 0){
+        if(confirm('Are you sure you want to remove this user?')){
+            payload = {
+                req : 'removeUser',
+                uid : uid
+            }
+            $.ajax({
+                url: 'ajax/user.php',
+                type: 'post',
+                data: payload,
+                success: (r)=>{
+                    r = JSON.parse(r)
+                    if(r['result']){
+                        alert(r['message'])
+                        $('button[data-uid='+uid+']').parent().parent().remove()
+                    }else{
+                        alert(e['error'])
+                    }
+                    
+                }
+            })
+        }
+    }
+}
+
+function updateUser(e){
+    console.log(e);
+    var uid = $(e).attr('data-uid');
+    var status = $(e).parent().parent().find('td select[name=status]')[0].value;
+    var role = $(e).parent().parent().find('td select[name=role]')[0].value;
+
+    if(uid > 0){
+        payload = {
+            req : 'updateUser',
+            uid : uid,
+            status: status,
+            role: role
+        }
+        $.ajax({
+            url: 'ajax/user.php',
+            type: 'post',
+            data: payload,
+            success: (r)=>{
+                console.log(r)
+                r = JSON.parse(r)
+                if(r['result']){
+                    alert(r['message'])
+                }else{
+                    alert(e['error'])
+                }
+            }
+        })
+    }
+}

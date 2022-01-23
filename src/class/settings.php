@@ -6,6 +6,12 @@ abstract class USERROLE{
     const USER = 4;
 }
 
+abstract class USERSTATUS{
+    const ACTIVE = 2;
+    const ONHOLD = 3;
+    const BANNED = 4;
+}
+
 abstract class SETTINGS{
     const securityQuestion = [
         "Choose question",

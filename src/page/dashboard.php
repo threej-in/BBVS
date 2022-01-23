@@ -43,7 +43,8 @@
         margin: 25px auto;
         border: 1px solid lightgrey;
         border-radius: 5px;
-        width: 70%;
+        min-width: 70%;
+        max-width: 77%;
         padding: 20px;
     }
     form{
@@ -55,6 +56,23 @@
     .error{
         color:red;
         font-size:14px;
+    }
+    td, th{
+        padding:10px;
+        color: grey;
+        border-bottom: 1px solid lightgrey;
+        text-align: left;
+    }
+    th{
+        color: black;
+    }
+    ul.info{
+        list-style-type: disc;
+        margin: 20px;
+    }
+    ul.info li{
+        font-size: 14px;
+        color: var(--dark);
     }
 </style>
 <script src="theme/script/dashboard.js"></script>
@@ -73,7 +91,7 @@
             <li><i class="fa fa-vote-yea fa-xs"></i> My Votes</li>
             <?php
                 if(isset($_SESSION['role']) && $_SESSION['role'] == USERROLE::ADMIN){
-                    echo '<li><i class="fa fa-users-cog fa-xs"></i> User Management</li>
+                    echo '<li onclick="showUsers()"><i class="fa fa-users-cog fa-xs"></i> User Management</li>
                         <li><i class="fa fa-sliders-h fa-xs"></i> Polls Management</li>';
                 }elseif(isset($_SESSION['role']) && $_SESSION['role'] == USERROLE::MODERATOR){
                     echo '<li><i class="fa fa-sliders-h fa-xs"></i> Polls Management</li>';
