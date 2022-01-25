@@ -5,6 +5,22 @@
         require __DIR__.'/../class/settings.php';
         // var_dump($t->strValidate('ad','!@'));die;        
         switch($_POST['req']){
+            case 'deleteAccount':
+                $t->query('UPDATE `bbvsusertable` SET `NAME`=null,`USERNAME`=null,`EMAIL`=null,`PASSWORD`=null,`STATUS`=null,`ROLE`=null,`REGDATE`=null,`SECURITYQUESTION`=null,`SECURITYANSWER`=null,`IMAGE`=null WHERE username = ?',[
+                    [&$_SESSION['username'],'s']
+                ]);
+                if(false !== $t->execute()){
+                    session_unset();
+                    echo json_encode([
+                        'result' => true
+                    ]);
+                    return;
+                }
+                echo json_encode([
+                    'result' => false
+                ]);
+                return;
+            break;
             case 'profile':
                 !isset($_SESSION['username']) ? die:'';
                 $t->query('SELECT * FROM BBVSUSERTABLE WHERE USERNAME = ?',[[&$_SESSION['username'],'s']]);
@@ -54,11 +70,34 @@
                         <input type="text" name="securityAnswer" placeholder="Your answer" onkeydown="return validateString(event.key,'!@')">
                     </section>
                     <button class="blue" type="button" onclick="updateProfile()" name="updateprofile">Update profile</button>
+                    <button style="background-color: #d12525;color:white;" type="button" onclick="deleteAccount(this)" name="removeprofile">Delete account</button>
                 </form>
             <?php
                 }else{
                     echo '<p class="red">Unable to fetch user details at the movement.</p>';
                 }
+                return;
+            break;
+            case 'removeUser':
+                if($_SESSION['role'] == USERROLE::ADMIN){
+                    $t->query('DELETE FROM BBVSUSERTABLE WHERE UID = ? && (ROLE = ? || ROLE = ?)',
+                    [
+                        [&$_POST['uid'],'i'],
+                        [USERROLE::MODERATOR,'i'],
+                        [USERROLE::USER,'i']
+                    ]);
+                    if(false !== $t->execute() && $t->affected_rows == 1){
+                        echo json_encode([
+                            'result' => true,
+                            'message' => 'User removed'
+                        ]);
+                        return;
+                    }
+                }
+                echo json_encode([
+                    'result' => false,
+                    'message' => 'Failed to remove user'
+                ]);
                 return;
             break;
             case 'securityQuestion':
@@ -133,6 +172,29 @@
                     $t->execute();
                     return;
                 }
+            break;
+            case 'updateUser':
+                if($_SESSION['role'] == USERROLE::ADMIN){
+                    $t->query('UPDATE BBVSUSERTABLE SET STATUS = ?, ROLE = ? WHERE UID = ? AND ROLE <> ?',
+                    [
+                        [&$_POST['status'],'i'],
+                        [&$_POST['role'],'i'],
+                        [&$_POST['uid'],'i'],
+                        [USERROLE::ADMIN,'i'],
+                    ]);
+                    if(false !== $t->execute() && $t->affected_rows == 1){
+                        echo json_encode([
+                            'result' => true,
+                            'message' => 'User role, status updated successfuly'
+                        ]);
+                        return;
+                    }
+                }
+                echo json_encode([
+                    'result' => false,
+                    'message' => 'Failed to update user'
+                ]);
+                return;
             break;
             case 'uploadImage':
                 !isset($_SESSION['username']) ? die:'';
@@ -261,51 +323,7 @@
                 echo '</table>';
                 return;
             break;
-            case 'removeUser':
-                if($_SESSION['role'] == USERROLE::ADMIN){
-                    $t->query('DELETE FROM BBVSUSERTABLE WHERE UID = ? && (ROLE = ? || ROLE = ?)',
-                    [
-                        [&$_POST['uid'],'i'],
-                        [USERROLE::MODERATOR,'i'],
-                        [USERROLE::USER,'i']
-                    ]);
-                    if(false !== $t->execute() && $t->affected_rows == 1){
-                        echo json_encode([
-                            'result' => true,
-                            'message' => 'User removed'
-                        ]);
-                        return;
-                    }
-                }
-                echo json_encode([
-                    'result' => false,
-                    'message' => 'Failed to remove user'
-                ]);
-                return;
-            break;
-            case 'updateUser':
-                if($_SESSION['role'] == USERROLE::ADMIN){
-                    $t->query('UPDATE BBVSUSERTABLE SET STATUS = ?, ROLE = ? WHERE UID = ? AND ROLE <> ?',
-                    [
-                        [&$_POST['status'],'i'],
-                        [&$_POST['role'],'i'],
-                        [&$_POST['uid'],'i'],
-                        [USERROLE::ADMIN,'i'],
-                    ]);
-                    if(false !== $t->execute() && $t->affected_rows == 1){
-                        echo json_encode([
-                            'result' => true,
-                            'message' => 'User role, status updated successfuly'
-                        ]);
-                        return;
-                    }
-                }
-                echo json_encode([
-                    'result' => false,
-                    'message' => 'Failed to update user'
-                ]);
-                return;
-            break;
+            
         }
     }
     echo 'false';

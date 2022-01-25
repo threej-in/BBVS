@@ -26,8 +26,6 @@ $('#loginid').on('keypress', function (event) {
  * - !w to exclude words/characters/digits
  * - !@ to exclude special characters
  * - email to validate email
- * - special to validate special charaters
- * - emt to check the there is data or not
 */
 function validateString(str, option){
     switch(option){

@@ -12,6 +12,9 @@
                 width: 25%;
                 margin-right: 20px;
             }
+            footer ul li a,footer ul li a:hover{
+                color: white;
+            }
         </style>
         <footer>
             <div class="flexrow widget">
@@ -25,8 +28,17 @@
                         <a target="_blank" href="https://www.linkedin.com/company/threejin"><li class="fab fa-linkedin" style="color: var(--white);"></li></a>
                     </div>
                 </div>
-                <div class="flexrow flexass"></div>
-                <div class="flexrow flexass"></div>
+                <div class="flexcol flexass">
+                    <h4>Navigation</h4>
+                    <ul style="list-style: none;" class="md">
+                        <li><a href="index.php">Home</a></li>
+                        <li><a href="page/dashboard.php">Dashboard</a></li>
+                        <li>Result</li>
+                    </ul>
+                </div>
+                <div class="flexcol flexass">
+                    
+                </div>
                 <div class="flexrow flexass"></div>
             </div>
             <hr class="white">

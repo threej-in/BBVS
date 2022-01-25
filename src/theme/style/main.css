@@ -29,6 +29,7 @@ a{
 }
 a:hover{
     color: var(--blue);
+    text-decoration: underline;
 }
 body{
     scroll-behavior: smooth;

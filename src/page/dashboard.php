@@ -1,6 +1,7 @@
 <?php
     //dashboard page
     include __DIR__.'/../theme/header.php';
+    if(!isset($_SESSION['username'])) header('Location: login.php');
     $t->query('SELECT * FROM BBVSUSERTABLE WHERE USERNAME = ?', [[&$_SESSION['username'],'s']]);
     if(false != $t->execute()){
         $user = $t->fetch();

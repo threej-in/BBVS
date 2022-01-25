@@ -134,7 +134,6 @@ function removeUser(e){
 }
 
 function updateUser(e){
-    console.log(e);
     var uid = $(e).attr('data-uid');
     var status = $(e).parent().parent().find('td select[name=status]')[0].value;
     var role = $(e).parent().parent().find('td select[name=role]')[0].value;
@@ -159,6 +158,26 @@ function updateUser(e){
                     alert(e['error'])
                 }
             }
+        })
+    }
+}
+
+function deleteAccount(e){
+    if(confirm('Are you sure you want to delete your account permanently? All the polls created by you will be deactivated and you will not be able to manage those polls.')){
+        $.ajax({
+            url : 'ajax/user.php',
+            type : 'post',
+            data : {
+                req : 'deleteAccount'
+            },
+            success : (r)=>{
+                r = JSON.parse(r)
+                if(r['result']){
+                    alert('Account deleted');
+                    location.href = 'index.php';
+                }
+            }
+
         })
     }
 }
