@@ -61,18 +61,7 @@ function validateString(str, option){
         case 'email':
             r = new RegExp(/^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/);
             return r.test(str);
-        break;
-        case 'emt':
-            if(str.length==0){
-                return false;
-            }else{
-                return true;
-            };
-        break;
-        case 'special':
-            var r = new RegExp("^[a-zA-Z0-9]+$");
-            return r;
-         break;      
+        break;  
     }
     return false;
 }
