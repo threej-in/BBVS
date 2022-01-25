@@ -70,6 +70,15 @@
     }
 ?>     
 <script>
+    function isEmpty(element){
+        if($('#'+element).val().trim() == ''){
+            $('#'+element+'_err').show()
+            $('#'+element+'_err').text(element + ' is required')
+            return true
+        }
+        $('#'+element+'_err').hide()
+        return false
+    }
   $(document).ready(function(){
       error = {
           'username' : false,
@@ -79,30 +88,16 @@
           'captcha' : false
       }
        
-      $('#name').on('keypress',function(){ 
-        var r = validateString($('#name').val(),'special');
-        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
-        if(!r.test(key)){
+      $('#name').on('blur',function(){ 
+        var r = validateString($('#name').val(),'!@');
+        if(!r){
             event.preventDefault();
-            $('p#nm_err').text('spcial charaters are not allow');
+            $('p#name_err').text('spcial charaters are not allow');
             
         }else{
-            $('p#nm_err').text('');
-            
+            $('p#name_err').text('');
         }
       });
-
-      $('#username').on('keypress',function(){ 
-        var r = validateString($('#username').val(),'special');
-        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
-        if(!r.test(key)){
-            event.preventDefault();
-            $('p#ur_err').text('spcial charatars are not allow');
-        }else{
-            $('p#ur_err').text('');
-        } 
-      });
-
 
       $('#captcha').on('keypress',function(){ 
         var r = validateString($('#captcha').val(),'special');
@@ -118,99 +113,75 @@
       });
 
 
-      $('#username').on('blur',function(){
-        error['username'] = validateString($('#username').val(),'emt');
-        if(error['username'] == false){
-            $('p#ur_err').text('enter data');
-        }else{
-            $('p#ur_err').hide();
-        }
+      $('#username').on('blur',function(){ 
+       if(!isEmpty('username')){
+            $('p#username_err').show()
+            if(!validateString(this.value,'!@')){
+                $('p#username_err').text('spcial charatars are not allowed');
+                return;
+            }
+            error['username'] = true
+            $('p#username_err').hide()
+       }
       });
 
-      $('#email').on('blur',function(){error['email'] =  validateString($('#email').val(),'emt') && validateString($('#email').val(),'email');
-        if(error['email']==false){
-           $('p#em_err').show();
-           $('P#em_err').text('Plese enter data');
-        }else{
-            $('p#em_err').hide();
+      $('#email').on('blur',function(){
+        if(!isEmpty('email')){
+            $('p#email_err').show();
+            if(!validateString(this.value,'email')){
+                $('p#email_err').text('Please enter a valid email address');
+                return
+            }
+            error['email'] =true
+            $('p#email_err').hide()
         }
       });
 
       $('#password').on('blur',function(){
-        error['password'] = validateString($('#password').val(),'emt')  &&  $('#password').val().length > 8;
-        console.log(validateString($('#password').val(),'emt'));
-        console.log(error['password']);
-        if(error['password']==false){
-           $('p#ps_err').show();
-           $('P#ps_err').text('Plese enter move then 8 data');
-        }else{
-            $('p#ps_err').hide();
+        if(!isEmpty('password')){
+            $('p#password_err').show();
+            if(this.value.length < 8){
+                $('p#password_err').text('Plese enter more then 8 char');
+                return
+            }
+            error['password'] = true;
+            $('p#password_err').hide();  
         }
       });
 
       $('#sa').on('blur',function(){
-        error['Sans'] = validateString($('#sa').val(),'emt');
-        if(error['Sans']==false){
-           $('P#sa_err').text('enter data');
-        }else{
-            $('p#sa_err').hide();
+        if(!isEmpty('sa')){
+            $('p#sa_err').show();
+            if(this.value.length < 3){
+                $('p#sa_err').text('Plese enter more then 3 char');
+                return
+            }
+            error['Sans'] = true;
+            $('p#sa_err').hide();  
         }
       });
-
+       
       $('#captcha').on('blur',function(){
-        error['captcha'] = validateString($('#captcha').val(),'emt');
-        if(error['captcha'] == false){
-            $('p#cp_err').text('enter data');
-        }else{
-            $('p#cp_err').hide();
+        if(!isEmpty('captcha')){
+            $('p#captcha_err').show();
+            console.log(this.value.length == 5);
+            if(this.value.length != 5){
+                $('p#captcha_err').text('Plese enter  then 5 char');
+                return
+            }
+            error['captcha'] = true;
+            $('p#captcha_err').hide();  
         }
       });
-     $('#btn').click(function(){
 
-        error['username'] = validateString($('#username').val(),'emt');
-        if(error['username']==false){
-           $('p#ur_err').show();
-           $('P#ur_err').text('Plese enter data');
-        }else{
-            $('p#ur_err').hide();
-        };
-        error['email'] =  validateString($('#email').val(),'emt') && validateString($('#email').val(),'email');
-        if(error['email']==false){
-           $('p#em_err').show();
-           $('P#em_err').text('Plese enter data');
-        }else{
-            $('p#em_err').hide();
-        };
-
-        error['password'] = validateString($('#password').val(),'emt')  && ValidityString($('#password').val().length > 8);
-        if(error['password']==false){
-           $('p#ps_err').show();
-           $('P#ps_err').text('Plese enter data');
-        }else{
-            $('p#ps_err').hide();
-        };
-
-        error['Sans'] = validateString($('#sa').val(),'emt');
-        if(error['Sans']==false){
-           $('P#sa_err').text('enter data');
-        }else{
-            $('p#sa_err').hide();
-        };
-
-        error['captcha'] = validateString($('#captcha').val(),'emt');
-        if(error['captcha'] == false){
-            $('p#cp_err').text('enter data');
-        }else{
-            $('p#cp_err').hide();
-        };
-
-        if(error['username'] && error['email'] && error['password'] && error['Sans'] && error['captcha'] ==true)
+     $('#submit_btn').click(function(){
+        if(error['username'] && error['email'] && error['password'] && error['Sans'] && error['captcha'])
         {
-
+            console.log('ok');
             return true;
         }else{
             $('form').submit((e)=>{e.preventDefault()});
-            $('form').submit();
+            //$('form').submit();
             return false;
         }
      });
@@ -247,22 +218,22 @@
         <section>
             <label for="name" >Name</label>
             <input type="text" name="name" id="name" value="<?php echo $_POST['name'] ?? '' ?>" placeholder="Enter your name" >
-            <p id="nm_err" class="red"></p>
+            <p id="name_err" class="red sm"></p>
         </section>
         <section>
             <label for="username">Username</label>
             <input type="text" name="username" id="username" value="<?php echo $_POST['username'] ?? '' ?>" placeholder="Choose an username" >
-            <p id="ur_err" class="red"></p>
+            <p id="username_err" class="red sm"></p>
         </section>
         <section>
             <label for="email">Email</label>
             <input type="email" name="email" id="email" value="<?php echo $_POST['email'] ?? '' ?>" placeholder="Enter your email address..." >
-            <p id="em_err" class="red"></p>
+            <p id="email_err" class="red sm"></p>
         </section>
         <section>
             <label for="password">Password</label>
             <input type="password" name="password" id="password" placeholder="Enter your password" >
-            <p id="ps_err" class="red"></p>
+            <p id="password_err" class="red sm"></p>
         </section>
         <section>
                 <label for="securityQuestion">Choose security question</label>
@@ -274,17 +245,17 @@
                     echo '</select>';
                 ?>              
                 <input type="text" name="securityAnswer" placeholder="Your answer" id="sa">
-                <p id="sa_err" class="red"></p>
+                <p id="sa_err" class="red sm"></p>
             </section>
         <section>
             <label for="captcha">Captcha</label>
             <div class="flexrow">
                 <input style="min-width:50%;max-width:60%;" type="text" name="captcha" id="captcha" placeholder="Enter text as shown" >
                 <img style="border: 1px solid grey;border-radius:5px;" src="<?php echo $t->getCaptcha();?>">
-                <p id="cp_err" class="red"></p>
+                <p id="cp_err" class="red sm"></p>
             </div>
         </section>
-        <button name="register" type="submit" class="blue" id="btn">Register</button>
+        <button name="register" type="submit" class="blue" id="submit_btn">Register</button>
         
     </form>
 </div>
