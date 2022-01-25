@@ -25,7 +25,10 @@ $('#loginid').on('keypress', function (event) {
  * - !d to exclude digits
  * - !w to exclude words/characters/digits
  * - !@ to exclude special characters
- */
+ * - email to validate email
+ * - special to validate special charaters
+ * - emt to check the there is data or not
+*/
 function validateString(str, option){
     switch(option){
         case 'c':
@@ -55,6 +58,21 @@ function validateString(str, option){
             r = new RegExp(/^\D+$/,'g');
             return r.test(str);
         break;
+        case 'email':
+            r = new RegExp(/^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/);
+            return r.test(str);
+        break;
+        case 'emt':
+            if(str.length==0){
+                return false;
+            }else{
+                return true;
+            };
+        break;
+        case 'special':
+            var r = new RegExp("^[a-zA-Z0-9]+$");
+            return r;
+         break;      
     }
     return false;
 }
