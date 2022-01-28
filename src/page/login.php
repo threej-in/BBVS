@@ -21,7 +21,7 @@
                 [&$loginid,'s']
             ];
             if($t->strValidate($loginid, 'email')){
-                $result = $t->query('SELECT USERNAME,PASSWORD,ROLE from BBVSUSERTABLE WHERE EMAIL = ? AND PASSWORD = ?', $values);
+                $result = $t->query('SELECT USERNAME,PASSWORD,ROLE from BBVSUSERTABLE WHERE EMAIL = ?', $values);
             }else{
                 $result = $t->query('SELECT USERNAME,PASSWORD,ROLE from BBVSUSERTABLE WHERE USERNAME = ?', $values);
             }
@@ -114,7 +114,7 @@
             }
         )
     }
-   $(document).ready(function(){
+   $(()=>{
         $('#loginid').on('blur',function(){
             if(!validateString(this.value,'email')){
                 $('p#id_err').text('Please Enter valid email');
@@ -141,7 +141,11 @@
             if(isEmpty('answer'))return;
             $('#answer_err').hide();
         });
-    })
+        $('#btnsubmit').on('click',()=>{
+            $('input').blur()
+            $('form').submit()
+        })
+    });
 </script>
 <div class="login-form">
     <?php if(isset($success)){
@@ -190,12 +194,12 @@
                 <label for="captcha">Captcha</label>
                 <div class="flexrow">
                     <input style="min-width:50%;max-width:60%;" type="text" name="captcha" id="captcha" placeholder="Enter text as shown in image" required>
-                    <p id="captcha_err" class='red sm'></p>
                     <img style="border: 1px solid grey;border-radius:5px;" src="<?php echo $t->getCaptcha();?>">
+                    <p id="captcha_err" class='red sm'></p>
                 </div>
             </section>
             <p class="red sm" id="error"><?php echo $error ?></p>
-            <button type="submit" name="<?php echo $passResetForm ?'resetPassword':'login' ?>" class="blue"><?php echo $passResetForm ?'Reset Password':'Login' ?></button>
+            <button id="btnsubmit" type="submit" name="<?php echo $passResetForm ?'resetPassword':'login' ?>" class="blue"><?php echo $passResetForm ?'Reset Password':'Login' ?></button>
         </form>
     <?php }?>
 </div>
