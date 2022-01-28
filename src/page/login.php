@@ -1,5 +1,5 @@
 <?php
-    require __DIR__.'/../theme/header.php';
+  require __DIR__.'/../theme/header.php';
     if(isset($_SESSION['username'])){
         header('Location: dashboard.php');        
     }
@@ -21,7 +21,7 @@
                 [&$loginid,'s']
             ];
             if($t->strValidate($loginid, 'email')){
-                $result = $t->query('SELECT USERNAME,PASSWORD,ROLE from BBVSUSERTABLE WHERE EMAIL = ?', $values);
+                $result = $t->query('SELECT USERNAME,PASSWORD,ROLE from BBVSUSERTABLE WHERE EMAIL = ? AND PASSWORD = ?', $values);
             }else{
                 $result = $t->query('SELECT USERNAME,PASSWORD,ROLE from BBVSUSERTABLE WHERE USERNAME = ?', $values);
             }
@@ -90,7 +90,7 @@
     }
 </style>
 <script>
-    function fetchdata(e){
+   function fetchdata(e){
         if(e.value == ''){
             $('#error').text('Login id cannot be empty');
             return;
@@ -114,6 +114,34 @@
             }
         )
     }
+   $(document).ready(function(){
+        $('#loginid').on('blur',function(){
+            if(!validateString(this.value,'email')){
+                $('p#id_err').text('Please Enter valid email');
+                return;
+            }
+            $('p#id_err').hide();
+        });
+
+        $('#captcha').on('blur',function(){
+          if(this.value.length != 5){
+              $('#captcha_err').text('captcha must 5 charaters');
+              console.log('must 5');
+              return;
+          }
+          $('#captcha_err').hide();
+        });
+
+        $('#password').on('blur',function(){
+            if(isEmpty('password'))return;
+            $('#password_err').hide();
+        });
+
+        $('#answer').on('blur',function(){
+            if(isEmpty('answer'))return;
+            $('#answer_err').hide();
+        });
+    })
 </script>
 <div class="login-form">
     <?php if(isset($success)){
@@ -134,7 +162,8 @@
             </div>
             <section>
                 <label for="loginid"><?php echo $passResetForm ? 'Enter your email or username':'Username or Email'?></label>
-                <input type="text" <?php echo $passResetForm ? 'onblur="fetchdata(this)"':0;?> name="loginid" id="loginid" value="<?php echo $_POST['loginid'] ?? '' ?>" placeholder="Enter your login Id">
+                <input type="text" onblur="fetchdata(this)" autocomplete="off" name="loginid" id="loginid" value="<?php echo $_POST['loginid'] ?? '' ?>" placeholder="Enter your login Id">
+                <p id='id_err' class="red sm"></p>
             </section>
         <?php 
             echo $passResetForm 
@@ -142,10 +171,12 @@
                 '<section class="hide">
                     <label for="question"></label>
                     <input type="text" name="answer" id="answer" placeholder="Enter your answer" required>
+                    <p id="answer_err" class="red sm"></p>
                 </section>
                 <section class="hide">
                     <label for="password">New Password</label>
-                    <input type="password" name="password" id="password" placeholder="Enter new password" required>
+                    <input type="password" name="password" id="password" placehold  er="Enter new password" required>
+                    <p id="password_err" class="red sm"></p>
                 </section>'
             :
                 '<section>
@@ -156,9 +187,10 @@
         ?>
             
             <section>
-                <label for="captcha">Captcha <span class="xs">[Not case-sensitive]</span></label>
+                <label for="captcha">Captcha</label>
                 <div class="flexrow">
                     <input style="min-width:50%;max-width:60%;" type="text" name="captcha" id="captcha" placeholder="Enter text as shown in image" required>
+                    <p id="captcha_err" class='red sm'></p>
                     <img style="border: 1px solid grey;border-radius:5px;" src="<?php echo $t->getCaptcha();?>">
                 </div>
             </section>
