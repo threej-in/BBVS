@@ -115,11 +115,18 @@
         )
     }
    $(()=>{
+       error = {
+         loginid: false,
+         captcha: false,
+         password: false,
+         answer:false   
+       };
         $('#loginid').on('blur',function(){
             if(!validateString(this.value,'email')){
                 $('p#id_err').text('Please Enter valid email');
-                return;
+                return false;
             }
+            error['loginid'] = true;
             $('p#id_err').hide();
         });
 
@@ -127,24 +134,42 @@
           if(this.value.length != 5){
               $('#captcha_err').text('captcha must 5 charaters');
               console.log('must 5');
-              return;
+              return error['captcha'] = false;
           }
+          error['captcha'] = true;
           $('#captcha_err').hide();
         });
 
         $('#password').on('blur',function(){
-            if(isEmpty('password'))return;
+            if(isEmpty('password'))return false;
+            error['password'] = true;
             $('#password_err').hide();
         });
 
         $('#answer').on('blur',function(){
-            if(isEmpty('answer'))return;
+            if(isEmpty('answer'))return false;
+            error['answer'] = true;
             $('#answer_err').hide();
         });
         $('#btnsubmit').on('click',()=>{
-            $('input').blur()
-            $('form').submit()
-        })
+         $('input').blur;
+         debugger;
+         if(error['loginid'] && error['password'] && error['captcha']){
+             if(document.getElementById('btnsubmit').name == "resetPassword"){
+                 if(error['answer']){
+                    $('#error').text('');
+                     $('form').submit();
+                 }else{
+                    $('#error').text('please enter all data ');
+                     return;
+                 }
+             }
+             $('#error').text('');
+           $('form').submit();
+        }else{
+            $('#error').text('please enter all data ');
+        }
+        });
     });
 </script>
 <div class="login-form">
@@ -174,7 +199,7 @@
             ?
                 '<section class="hide">
                     <label for="question"></label>
-                    <input type="text" name="answer" id="answer" placeholder="Enter your answer" required>
+                    <input type="text" name="answer" id="answer" placeholder="Enter your answer" >
                     <p id="answer_err" class="red sm"></p>
                 </section>
                 <section class="hide">
@@ -186,6 +211,7 @@
                 '<section>
                     <label for="password">Password <span style="float: right;color:grey;"><a href="page/login.php?req=reset-password">Forgot Password?</a></span></label>
                     <input type="password" name="password" id="password" placeholder="Enter your password" required>
+                    <p id="password_err" class="red sm"></p>
                 </section>'
             ;
         ?>
