@@ -1,23 +1,11 @@
-$_GET = {}
-$(()=>{
-    //convert query parameters from string to js object and store it in $_GET
-    location.href.indexOf('?') > 0 ? location.href.split('?')[1].split('&').forEach(e => {
-        $_GET[e.split('=')[0]] = e.split('=')[1]
-    }):'';
-})
-/*var menu = document.querySelector(".mnu");
-menu.addEventListener("click",function(){
-    document.querySelector("body").classList.toggle("active");  
-})*/
 
-
-//not allow  use to enter the special charecters// 
+//not allow  user to enter the special charecters only '@' '.' are allow// 
 $('#loginid').on('keypress', function (event) {
-    var regex = new RegExp("^[a-zA-Z0-9]+$");
+    var regex = new RegExp("^[a-zA-Z0-9@.]+$");
     var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
     if (!regex.test(key)) {
         event.preventDefault();
-        // $('error').text('special char not allowed');
+         $('#id_err').text('special char not allowed');
         return false;
     }
 });
@@ -33,6 +21,8 @@ $('#loginid').on('keypress', function (event) {
  * - !w to exclude words/characters/digits
  * - !@ to exclude special characters
  * - email to validate email
+ * - special to validate special charaters
+ * - emt to check the there is data or not
 */
 function validateString(str, option){
     switch(option){
@@ -70,4 +60,12 @@ function validateString(str, option){
     }
     return false;
 }
-
+function isEmpty(element){
+    if($('#'+element).val().trim() == ''){
+        $('#'+element+'_err').show()
+        $('#'+element+'_err').text(element + ' is required')
+        return true
+    }
+    $('#'+element+'_err').hide()
+    return false
+}
