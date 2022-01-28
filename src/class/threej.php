@@ -72,7 +72,11 @@ class threej extends threejdb{
      */
     function getCaptcha(){
         try{
-            $this->captcha->build();
+            $this->captcha->setMaxFrontLines(0);
+            $this->captcha->setMaxBehindLines(2);
+            $this->captcha->setBackgroundColor(250,250,250);
+            // $this->captcha->setsty;
+            $this->captcha->build(150,40,ROOTDIR.'class/Gregwar/Captcha/Font/captcha4.ttf');
             $_SESSION['captcha'] = $this->captcha->getPhrase();
             return $this->captcha->inline();
         }catch(Exception $e){

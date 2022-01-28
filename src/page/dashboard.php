@@ -41,10 +41,10 @@
         width: 22px;
     }
     div.content{
-        margin: 25px auto;
+        margin: 5px auto;
         border: 1px solid lightgrey;
         border-radius: 5px;
-        min-width: 70%;
+        min-width: 73%;
         max-width: 77%;
         padding: 20px;
     }
@@ -88,17 +88,18 @@
         </div>
         <ul>
             <hr style="height: 1px; background-color:lightgrey;margin:0;">
-            <li><i class="fa fa-poll fa-sm"></i> My Polls</li>
+            <li id="newpoll" onclick="showContent('newPoll')"><i class="fa fa-plus fa-md"></i> Create New Poll</li>
+            <li id="mypolls" onclick="showContent('showPolls')"><i class="fa fa-poll fa-sm"></i> My Polls</li>
             <li><i class="fa fa-vote-yea fa-xs"></i> My Votes</li>
             <?php
                 if(isset($_SESSION['role']) && $_SESSION['role'] == USERROLE::ADMIN){
-                    echo '<li onclick="showUsers()"><i class="fa fa-users-cog fa-xs"></i> User Management</li>
+                    echo '<li onclick="showContent(\'userManagement\')"><i class="fa fa-users-cog fa-xs"></i> User Management</li>
                         <li><i class="fa fa-sliders-h fa-xs"></i> Polls Management</li>';
                 }elseif(isset($_SESSION['role']) && $_SESSION['role'] == USERROLE::MODERATOR){
                     echo '<li><i class="fa fa-sliders-h fa-xs"></i> Polls Management</li>';
                 }
             ?>
-            <li onclick="showProfile()"><i class="fa fa-cog fa-xs"></i> Account Settings</li>
+            <li id="profile" onclick="showContent('profile')"><i class="fa fa-cog fa-xs"></i> Account Settings</li>
         </ul>
         <hr style="height:50px;">
     </div>

@@ -43,7 +43,7 @@
 <body>
   <header class="flexrow white">
     <div class="flexrow flexasc">
-      <a href="index.php" class="flexrow">
+      <a href="index.php" class="flexrow" style="text-decoration: none;">
         <img class="logo brad50" src="theme/img/logo.png" alt="Blockchain Based Voting system" height="40px" width="40px">
         <h3 style="font-weight: 800;letter-spacing: -1px;">BBVS</h3>
       </a>
@@ -67,14 +67,23 @@
             <img src="'.$pp.'" class="brad50" style="border:1px solid grey;" height="35px" width="35px" />'.$_SESSION['username'].'
           </a>
           <li class="dropdown">
+            <i class="fa fa-user fa-md" style="padding-right:5px"></i>
+            <a href="page/dashboard.php?show=profile">
+              Profile
+            </a><hr>
+            <i class="fa fa-poll fa-md" style="padding-right:5px"></i>
+            <a href="page/dashboard.php?show=mypolls">
+              My polls
+            </a><hr>
+            <i class="fa fa-sign-out-alt fa-sm" style="padding-right:5px"></i>
             <a href="page/logout.php">
-              <i class="fa fa-sign-out-alt fa-lg" style="padding-right:5px"></i> Log out
+              Log out
             </a>
           </li>
         </span>':
         '<li><a href="page/login.php"><i class="fa fa-sign-in-alt fa-sm"></i> Log In</a></li>';
       ?>
-      <li><a href="#">About</a></li>
+      <li><a href="page/dashboard.php?show=newpoll"><button class="blue"><i class="fa fa-plus"></i> Create Poll</button></a></li>
     </ul>
   </header>
 <main style="padding: 30px;">

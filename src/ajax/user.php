@@ -21,13 +21,51 @@
                 ]);
                 return;
             break;
+            case 'newPoll': ?>
+                <style>
+
+                </style>
+                <div class="newPoll">
+                    <form action="#" method="POST" id="newPoll">
+                        <div>
+                            <h2 style="color: var(--grey);">Submit a new poll</h2>
+                        </div>
+                        <section>
+                            <label for="name">Title</label>
+                            <input type="text" name="name" id="name" value="<?php echo $_POST['name'] ?? '' ?>" placeholder="Poll title" required>
+                            <p id="name_err" class="red sm"></p>
+                        </section>
+                        <section>
+                            <label for="description">Description</label>
+                            <input type="text" name="description" id="description" value="<?php echo $_POST['description'] ?? '' ?>" placeholder="A short description for your poll" required>
+                            <p id="description_err" class="red sm"></p>
+                        </section>
+                        <section>
+                            <label for="">Upload an image for your poll</label>
+                            <input type="file" onchange="validateImage(this.files)" accept=".jpg,.png,.jpeg" name="pollpic" id="profileImage" required>
+                            <p class="message"></p>
+                        </section>
+                        <section>
+                            <label for="option">Options</label>
+                            <input type="text" name="option1" placeholder="Option 1">
+                            <input type="text" name="option2" placeholder="Option 2">
+                            <button data-no="2" onclick="n=$(this).attr('data-no');n++;$(this).before(`<input type='text' name='option${n}' placeholder='Option ${n}'>`);$(this).attr('data-no',n)" type="button" style="color: var(--dark);"><i class="fa fa-plus"></i> Add more option</button>
+                            <p id="email_err" class="red sm"></p>
+                        </section>
+                        <p class="red md"><?php echo $error ?? '' ?></p>
+                        <button name="register" type="button" class="blue" id="submit_btn">Create Poll</button>
+                    </form>
+                </div>
+                <?php
+                return;
+            break;
             case 'profile':
                 !isset($_SESSION['username']) ? die:'';
                 $t->query('SELECT * FROM BBVSUSERTABLE WHERE USERNAME = ?',[[&$_SESSION['username'],'s']]);
                 if(false !== $t->execute()){
                     $user = $t->fetch();
                 ?>
-                <h3 style="color: var(--grey);">Profile settings</h3><hr>
+                <h2 style="color: var(--grey);">Profile settings</h2><hr>
                 <form action="page/dashboard.php" method="POST" enctype="multipart/form-data">
                     <section>
                         <img data-id="profilepic" src="<?php echo empty($user['IMAGE']) ? 'theme/img/boy.jpg' : 'contents/img/profilepic/'.$user['IMAGE'] ?>" alt="" width="150px" height="150px">
@@ -72,7 +110,7 @@
                     <button class="blue" type="button" onclick="updateProfile()" name="updateprofile">Update profile</button>
                     <button style="background-color: #d12525;color:white;" type="button" onclick="deleteAccount(this)" name="removeprofile">Delete account</button>
                 </form>
-            <?php
+                <?php
                 }else{
                     echo '<p class="red">Unable to fetch user details at the movement.</p>';
                 }
@@ -122,6 +160,19 @@
                     return;
                 }
                 echo 'false';
+            break;
+            case 'showPolls':
+                !isset($_SESSION['username']) ? die:'';
+                ?>
+                
+                <div>
+                    <div class="flexrow">
+                        <h3 style="color: var(--grey);">List of polls created by you</h3>
+                    </div>
+
+                </div>
+                <?php
+                return;
             break;
             case 'updateProfile':
                 $answer = password_hash($_POST['securityAnswer'], PASSWORD_DEFAULT);
@@ -250,7 +301,8 @@
                 $t->execute();
                 
                 echo '
-                    <h3 style="color: var(--grey);text-align:center;">User management</h3><hr style="height:25px;">
+                    <h2 style="color: var(--grey);text-align:center;">User management</h2>
+                    <hr style="height:25px;">
                     <ul class="info">
                         <li>You can promote users and moderators</li>
                         <li>You can remove users and moderators but not other admins</li>

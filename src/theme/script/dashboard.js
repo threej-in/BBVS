@@ -1,5 +1,4 @@
 var fd = new FormData();
-
 $(
     //add event to change the color of sidebar list on click
     ()=>{
@@ -8,6 +7,9 @@ $(
             $(e.target).addClass('active');
             loading();
         })
+        if($_GET['show']){
+            $('#'+$_GET['show']).click()
+        }
     }
 )
 //"loading" spinner
@@ -15,9 +17,10 @@ function loading(){
     $('#contentArea').html('<img style="margin-left: calc(100% - 22em);" width="100px" src="theme/img/loading.gif">');
 }
 
-function showProfile(){
+function showContent(request){
     $.post(
-        'ajax/user.php',{ req : 'profile' },
+        'ajax/user.php',
+        { req : request },
         (result)=>{
             $('#contentArea').html(result);
         }
@@ -95,15 +98,6 @@ function updateProfile(){
             console.log(error)
         }
     })
-}
-
-function showUsers(){
-    $.post(
-        'ajax/user.php',{ req : 'userManagement' },
-        (result)=>{
-            $('#contentArea').html(result);
-        }
-    )
 }
 
 function removeUser(e){

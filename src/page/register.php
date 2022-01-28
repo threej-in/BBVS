@@ -220,7 +220,7 @@
             <p id="sa_err" class="red"></p>
         </section>
         <section>
-            <label for="captcha">Captcha</label>
+            <label for="captcha">Captcha <span class="xs">[Not case-sensitive]</span></label>
             <div class="flexrow">
                 <input style="min-width:50%;max-width:60%;" type="text" name="captcha" id="captcha" placeholder="Enter text as shown" >
                 <img style="border: 1px solid grey;border-radius:5px;" src="<?php echo $t->getCaptcha();?>">

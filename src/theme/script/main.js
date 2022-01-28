@@ -1,8 +1,15 @@
-
+$_GET = {}
+$(()=>{
+    //convert query parameters from string to js object and store it in $_GET
+    location.href.indexOf('?') > 0 ? location.href.split('?')[1].split('&').forEach(e => {
+        $_GET[e.split('=')[0]] = e.split('=')[1]
+    }):'';
+})
 /*var menu = document.querySelector(".mnu");
 menu.addEventListener("click",function(){
     document.querySelector("body").classList.toggle("active");  
 })*/
+
 
 //not allow  use to enter the special charecters// 
 $('#loginid').on('keypress', function (event) {
@@ -63,3 +70,4 @@ function validateString(str, option){
     }
     return false;
 }
+
