@@ -152,7 +152,7 @@
             $('#answer_err').hide();
         });
         $('#btnsubmit').on('click',()=>{
-         $('input').blur;
+         $('input').blur();
          debugger;
          if(error['loginid'] && error['password'] && error['captcha']){
              if(document.getElementById('btnsubmit').name == "resetPassword"){
@@ -199,7 +199,7 @@
             ?
                 '<section class="hide">
                     <label for="question"></label>
-                    <input type="text" name="answer" id="answer" placeholder="Enter your answer" >
+                    <input type="text" name="answer" id="answer" placeholder="Enter your answer" required>
                     <p id="answer_err" class="red sm"></p>
                 </section>
                 <section class="hide">
