@@ -1,3 +1,4 @@
+var AJAXURL = 'ajax/user.php';
 var fd = new FormData();
 $(
     //add event to change the color of sidebar list on click
@@ -18,8 +19,8 @@ function loading(){
 }
 
 function showContent(request){
-    $.post(
-        'ajax/user.php',
+    callAjax(
+        AJAXURL,
         { req : request },
         (result)=>{
             $('#contentArea').html(result);
@@ -27,18 +28,22 @@ function showContent(request){
     )
 }
 
-function validateImage(img, upload = false){
-    img = img[0]
+function validateImage(fileInput, upload = false, id ='profilepic', size = 100){
+    console.log(fileInput)
+    img = fileInput.files[0]
     if(typeof img === 'object'){
-        if(img.size > 100000){
+        if(img.size > size*1024){
             alert('Image size should be under 100kb');
-            return
+            $(fileInput).val('')
+            return false;
         }
         if(!['image/jpeg','image/jpg','image/png'].includes(img.type)){
             alert('Please choose a valid image file.');
-            return
+            $(fileInput).val('')
+            return false;
         }
-        $('img[data-id=profilepic]').attr('src',URL.createObjectURL(img));
+        $(`img[data-id=${id}]`).attr('src',URL.createObjectURL(img));
+        $(`img[data-id=${id}]`).show()
         
         fd.append('file', img);
         fd.append('req','uploadImage');
@@ -46,13 +51,10 @@ function validateImage(img, upload = false){
     }
 
     if(upload && fd.get('req') == 'uploadImage'){
-        $.ajax({
-            url : 'ajax/user.php',
-            type: 'post',
-            contentType: false,
-            processData:false,
-            data : fd,
-            success: function(result){
+        callAjax(
+            AJAXURL,
+            fd,
+            (result)=>{
                 r = JSON.parse(result)
                 if(r['result']){
                     alert(r['message']);
@@ -60,11 +62,11 @@ function validateImage(img, upload = false){
                     alert(r['error'])
                 }
             },
-            error: function(error) {
+            (error)=>{
                 alert('Failed to uplaod image!')
                 console.log(error);
             }
-        });
+        );
         return;
     }else{
         alert('Please choose an image before uploading');
@@ -76,43 +78,37 @@ function updateProfile(){
     fname = $('input[name=fname]')[0].value
     question = $('select[name=securityQuestion]')[0].value
     answer = $('input[name=securityAnswer]')[0].value
-    payload = {
-        req : 'updateProfile',
-        name : fname,
-        securityQuestion : question,
-        securityAnswer : answer
-    }
-    $.ajax({
-        url : 'ajax/user.php',
-        type : 'post',
-        data : payload,
-        success : (result)=>{
+    
+    callAjax(
+        AJAXURL,
+        {
+            req : 'updateProfile',
+            name : fname,
+            securityQuestion : question,
+            securityAnswer : answer
+        },
+        (result)=>{
             r = JSON.parse(result)
             if(r['result']){
                 alert(r['message']);
             }else{
                 alert(r['error'])
             }
-        },
-        error : (error)=>{
-            console.log(error)
         }
-    })
+    )
 }
 
 function removeUser(e){
     uid = $(e).attr('data-uid')
     if(uid > 0){
         if(confirm('Are you sure you want to remove this user?')){
-            payload = {
-                req : 'removeUser',
-                uid : uid
-            }
-            $.ajax({
-                url: 'ajax/user.php',
-                type: 'post',
-                data: payload,
-                success: (r)=>{
+            callAjax(
+                AJAXURL,
+                {
+                    req : 'removeUser',
+                    uid : uid
+                },
+                (r)=>{
                     r = JSON.parse(r)
                     if(r['result']){
                         alert(r['message'])
@@ -120,9 +116,8 @@ function removeUser(e){
                     }else{
                         alert(e['error'])
                     }
-                    
                 }
-            })
+            )
         }
     }
 }
@@ -139,39 +134,51 @@ function updateUser(e){
             status: status,
             role: role
         }
-        $.ajax({
-            url: 'ajax/user.php',
-            type: 'post',
-            data: payload,
-            success: (r)=>{
+        callAjax(
+            AJAXURL,
+            payload,
+            (r)=>{
                 console.log(r)
                 r = JSON.parse(r)
                 if(r['result']){
                     alert(r['message'])
                 }else{
-                    alert(e['error'])
+                    alert(r['message'])
                 }
             }
-        })
+        )
     }
 }
 
 function deleteAccount(e){
     if(confirm('Are you sure you want to delete your account permanently? All the polls created by you will be deactivated and you will not be able to manage those polls.')){
-        $.ajax({
-            url : 'ajax/user.php',
-            type : 'post',
-            data : {
-                req : 'deleteAccount'
-            },
-            success : (r)=>{
+        fd.append('req','deleteAccount')
+        callAjax(
+            AJAXURL,
+            fd,
+            (r)=>{
                 r = JSON.parse(r)
                 if(r['result']){
                     alert('Account deleted');
                     location.href = 'index.php';
                 }
             }
-
-        })
+        )
     }
+}
+
+function submitNewPoll(){
+    fd = new FormData($('#newPoll')[0]);
+    fd.append('req','createNewPoll');
+    callAjax(
+        AJAXURL,
+        fd,
+        (result)=>{
+            r = JSON.parse(result);
+            alert(r['message'])
+            if(r['result']){
+                showContent('showPolls')
+            }
+        }
+    )
 }

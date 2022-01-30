@@ -21,15 +21,16 @@
                 [&$loginid,'s']
             ];
             if($t->strValidate($loginid, 'email')){
-                $result = $t->query('SELECT USERNAME,PASSWORD,ROLE from BBVSUSERTABLE WHERE EMAIL = ?', $values);
+                $result = $t->query('SELECT UID,USERNAME,PASSWORD,ROLE from BBVSUSERTABLE WHERE EMAIL = ?', $values);
             }else{
-                $result = $t->query('SELECT USERNAME,PASSWORD,ROLE from BBVSUSERTABLE WHERE USERNAME = ?', $values);
+                $result = $t->query('SELECT UID,USERNAME,PASSWORD,ROLE from BBVSUSERTABLE WHERE USERNAME = ?', $values);
             }
             if(false !== $result){
                 $t->execute();
                 if($t->affected_rows == 1){
                     $result = $t->fetch();
                     if(password_verify($t->addSalt($password),$result['PASSWORD'])){
+                        $_SESSION['UID'] = $result['UID'];
                         $_SESSION['username'] = $result['USERNAME'];
                         $_SESSION['role'] = $result['ROLE'];
                         header('Location: dashboard.php');
@@ -91,6 +92,7 @@
 </style>
 <script>
    function fetchdata(e){
+       if(!($_GET['req'] && $_GET['req'] == 'reset-password')) return
         if(e.value == ''){
             $('#error').text('Login id cannot be empty');
             return;
@@ -121,14 +123,6 @@
          password: false,
          answer:false   
        };
-        $('#loginid').on('blur',function(){
-            if(!validateString(this.value,'email')){
-                $('p#id_err').text('Please Enter valid email');
-                return false;
-            }
-            error['loginid'] = true;
-            $('p#id_err').hide();
-        });
 
         $('#captcha').on('blur',function(){
           if(this.value.length != 5){
@@ -214,7 +208,6 @@
                 </section>'
             ;
         ?>
-            
             <section>
                 <label for="captcha">Captcha</label>
                 <div class="flexrow">
