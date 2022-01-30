@@ -1,5 +1,6 @@
 <?php
     require __DIR__.'/../theme/header.php';
+
 ?>
 <html>
  <head>
@@ -77,6 +78,12 @@
            .poll .answers label.selected .row{
                color:#6665ee;
            }
+           input[type="radio"]{
+               display:none;
+           }
+           #btn_submit{
+               color:#6665ee;
+           }
      </style>
      <script>
         $(document).ready(()=>{
@@ -95,35 +102,43 @@
      </script>
   
  </head>
- <body> 
-      <div class="poll">
-        <p class="quetion"> Select your Option</p>
-        <div class='answers'>
-           <label for="">
-            <div class="row">   
-               <span class="dot"></span>
-               <span class="text">option1</span>
-            </div>  
-            </label>
-            <label for="">
-            <div class="row">   
-               <span class="dot"></span>
-               <span class="text">option2</span>
-            </div>  
-            </label>
-            <label for="">
-            <div class="row"> 
-               <span class="dot"></span>
-               <span class="text">option3</span>
-            </div>  
-            </label>
-            <label for="">
-            <div class="row">    
-               <span class="dot"></span>
-               <span class="text">options4</span>
-            </div>  
-            </label>  
+ <body>
+     <form method="POST">
+        <div class="poll">
+            <p class="quetion"> Select your Option</p>
+            <div class='answers'>
+                <input type="radio" name="option" id="op1" value="op1">
+                <label for="op1">
+                    <div class="row">
+                    <span class="dot"></span>
+                    <span class="text">option1</span>
+                    </div>  
+                </label>
+                <input type="radio" name="option" id="op2" value="op2">
+                <label for="op2">
+                    <div class="row">    
+                    <span class="dot"></span>
+                    <span class="text">option2</span>
+                    </div>  
+                </label>
+                <input type="radio" name="option" id="op3" value="op3">
+                <label for="op3">
+                    <div class="row">      
+                    <span class="dot"></span>
+                    <span class="text">option3</span>
+                    </div>  
+                </label>
+                <input type="radio" name="option" id="op4" value="op4">
+                <label for="op4">
+                    <div class="row">     
+                    <span class="dot"></span>
+                    <span class="text">options4</span>
+                    </div>  
+                </label>  
+            </div>
+            <button type="submit" id='btn_submit'>Submit</button>
         </div>
-      </div>
+        
+     </form> 
  </body>
 </html>
