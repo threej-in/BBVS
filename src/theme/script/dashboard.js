@@ -7,7 +7,7 @@ $(
             $(e.target).addClass('active');
             loading();
         })
-        if($_GET['show']){
+        if($_GET ['show']){
             $('#'+$_GET['show']).click()
         }
     }

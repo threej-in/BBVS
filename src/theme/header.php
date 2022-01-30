@@ -83,7 +83,7 @@
         </span>':
         '<li><a href="page/login.php"><i class="fa fa-sign-in-alt fa-sm"></i> Log In</a></li>';
       ?>
-      <li><a href="page/dashboard.php?show=newpoll"><button class="blue"><i class="fa fa-plus"></i> Create Poll</button></a></li>
+      <li><a href="#" onclick="showContent('newPoll')"><button class="blue"><i class="fa fa-plus" ></i> Create Poll</button></a></li>
     </ul>
   </header>
 <main style="padding: 30px;">

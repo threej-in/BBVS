@@ -153,7 +153,6 @@
         });
         $('#btnsubmit').on('click',()=>{
          $('input').blur();
-         debugger;
          if(error['loginid'] && error['password'] && error['captcha']){
              if(document.getElementById('btnsubmit').name == "resetPassword"){
                  if(error['answer']){
