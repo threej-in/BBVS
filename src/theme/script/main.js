@@ -1,3 +1,9 @@
+$_GET = {}
+$(()=>{
+    location.search != '' ? location.search.split('?')[1].split('&').forEach((e)=>{
+        $_GET[e.split('=')[0]] = e.split('=')[1]
+    }) : 0;
+})
 
 //not allow  user to enter the special charecters only '@' '.' are allow// 
 $('#loginid').on('keypress', function (event) {
@@ -68,4 +74,32 @@ function isEmpty(element){
     }
     $('#'+element+'_err').hide()
     return false
+}
+/**
+ * 
+ * @param {string} url 
+ * @param {Object|FormData} data 
+ * @param {callback} success 
+ * @param {callback} error 
+ * @returns 
+ */
+function callAjax(url, data, success, error = {}){
+    if(!(data instanceof FormData)){
+        if(!(data instanceof Object)) return false;
+
+        fd = new FormData
+        for (key in data) { fd.append(key, data[key]) }
+        data = fd
+    }
+    $.ajax({
+        url : url,
+        type : 'post',
+        data : data,
+        contentType: false,
+        processData: false,
+        cache: false,
+        timeout: 800000,
+        success : success,
+        error : error
+    })
 }
