@@ -177,7 +177,7 @@ function submitNewPoll(){
             r = JSON.parse(result);
             alert(r['message'])
             if(r['result']){
-                showContent('showPolls')
+                $('#mypolls').click()
             }
         }
     )
