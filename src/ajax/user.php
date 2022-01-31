@@ -216,14 +216,113 @@
             break;
             case 'showPolls':
                 !isset($_SESSION['username']) ? die:'';
+                $t->query('SELECT * FROM BBVSPOLLS WHERE CREATEDBY = ?',[[&$_SESSION['UID'],'i']]);
+                if(false == $t->execute()){
+                    echo '<p class="red">Unable to fetch polls</p>';
+                    return;
+                }
                 ?>
-                
+                <style>
+                    .active-polls{
+                        column-gap: 1em;
+                    }
+                    .individual-polls{
+                        border-radius: 5px;
+                        box-shadow: 0 0 1px var(--dark);
+                        width: 60%;
+                        color: var(--grey);
+                        cursor: pointer;
+                        background-color: #f1f1f1;
+                    }
+                    .individual-polls img{
+                        width: 100%;
+                        height: 200px;
+                        object-fit: cover;
+                    }
+                    .individual-polls .details{
+                        position: relative;
+                        width: 100%;
+                    }
+                    .individual-polls .title{
+                        position: absolute;
+                        bottom: 0;
+                        margin: 0 15px;
+                        background-color: #ffffffd1;
+                        padding: 10px 0;
+                        width: 94%;
+                        box-shadow: 0px -7px 21px 9px #ffffffd1;
+                    }
+                    .individual-polls .options{
+                        width: 90%;
+                        padding: 20px 0;
+                    }
+                    .individual-polls .status{
+                        position: absolute;
+                        right: 7px;
+                        padding: 0px 10px;
+                        color: white;
+                        border: 1px solid black;
+                        border-radius: 6px;
+                        top: 7px;
+                    }
+                    input{
+                        width: fit-content;
+                    }
+                    input[type=radio]{
+                        transform: scale(1.5);
+                    }
+                </style>
                 <div>
                     <div class="flexrow">
                         <h3 style="color: var(--grey);">List of polls created by you</h3>
                     </div>
-
+                    <hr style="height: 20px;">
+                    <div class="flexrow flexass active-polls">
+                        <?php while($r = $t->fetch()){ ?>
+                            <div class="flexcol individual-polls">
+                                <div class="flexcol flexass details">
+                                    <img src="contents/img/pollpic/<?php echo $r['POLLIMAGE'] ?>" alt="">
+                                    <?php echo $r['STATUS'] ? 
+                                    '<div class="status" style="background-color: seagreen;">Active</div>' : 
+                                    '<div class="status" style="background-color: #d93939;">Not active</div>' ?>
+                                    <div class="title">
+                                        <h3><?php echo $r['POLLNAME'] ?></h3>
+                                        <p class="sm"><?php echo $r['DESCRIPTION'] ?></p>
+                                    </div>
+                                </div>
+                                <div class="flexcol flexass options">
+                                    <p class="md" style="color:grey;">Choose your answer</p>
+                                    <?php
+                                        $options = json_decode($r['OPTIONS']);
+                                        foreach($options as $k => $v){
+                                            echo 
+                                            '<div class="flexrow">
+                                                <input type="radio" name="vote" id="">
+                                                <label class="md">'.$v.'</label>
+                                            </div>';
+                                        }
+                                    ?>
+                                </div>
+                                <?php
+                                if($r['STATUS']){
+                                    echo '<button class="blue" style="margin: 0 0 20px 0;width: 92%;">Stop Poll</button>';
+                                }else{
+                                    echo '<select name="votingTime" id="" style="background-color: f1f1f1;width: 92%;">
+                                        <option value="0">Select Voting period</option>
+                                        <option value="1">One Day</option>
+                                        <option value="2">One Week</option>
+                                        <option value="3">Two Weeks</option>
+                                        <option value="4">Three Weeks</option>
+                                        <option value="5">One Month</option>
+                                    </select>
+                                    <button class="blue" style="margin: 0 0 20px 0;width: 92%;">Publish</button>';
+                                }
+                                ?>
+                            </div>
+                        <?php } ?>
+                    </div>
                 </div>
+                <hr style="height: 20px;">
                 <?php
                 return;
             break;
