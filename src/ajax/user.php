@@ -1,4 +1,6 @@
 <?php
+    $result = false;
+    $message = 'internal error occured';
     if(isset($_POST['req'])){
         require __DIR__.'/../class/threej.php';
         require __DIR__.'/../class/settings.php';
@@ -15,10 +17,6 @@
                     ]);
                     return;
                 }
-                echo json_encode([
-                    'result' => false
-                ]);
-                return;
             break;
             case 'createNewPoll':
                 if(!isset($_SESSION['UID'])) return;
@@ -75,6 +73,33 @@
                     ]
                 );
                 return;
+            break;
+            case 'modifyPoll':
+                if(!isset($_SESSION['UID'])) return;
+                if($_POST['action'] == 'publish'){
+                    if($_POST['period'] != 0){
+                        $time = time();
+                        $t->query('UPDATE BBVSPOLLS SET STATUS = 1,PERIOD=?,STARTDATE = ? WHERE PID = ?',[
+                            [&$_POST['period'],'i'],
+                            [&$time,'i'],
+                            [&$_POST['pid'],'i']
+                        ]);
+                        if(false != $t->execute()){
+                            $result = true;
+                            $message = 'Poll published!';
+                        }
+                    }else{
+                        $message = 'Invalid period selected.';
+                    }
+                }elseif($_POST['action'] == 'stop'){
+                    $t->query('UPDATE BBVSPOLLS SET STATUS = 0 WHERE PID = ?',[
+                        [&$_POST['pid'],'i']
+                    ]);
+                    if(false != $t->execute()){
+                        $result = true;
+                        $message = 'Poll stopped!';
+                    }
+                }
             break;
             case 'newPoll': ?>
                 <div class="newPoll">
@@ -135,7 +160,7 @@
                         <p class="message"></p>
                     </section>
                     <section>
-                        <label for="">username</label>
+                        <label for="">Username</label>
                         <input type="text" value="<?php echo $user['USERNAME']?>" disabled>
                         <p class="message"></p>
                     </section>
@@ -185,15 +210,10 @@
                         return;
                     }
                 }
-                echo json_encode([
-                    'result' => false,
-                    'message' => 'Failed to remove user'
-                ]);
-                return;
+                $message = 'Failed to remove user';
             break;
             case 'securityQuestion':
                 if(!isset($_POST['loginid'])){
-                    echo false;
                     return;
                 }
                 $loginid = $_POST['loginid'];
@@ -305,7 +325,10 @@
                                 </div>
                                 <?php
                                 if($r['STATUS']){
-                                    echo '<button class="blue" style="margin: 0 0 20px 0;width: 92%;">Stop Poll</button>';
+                                    $title = urlencode($r['POLLNAME']);
+                                    echo '
+                                    <button class="blue" style="width: 92%;" onclick="location.href=\'page/created_poll.php?title='.$title.'\'">Cast your vote &nbsp;<i class="fa fa-external-link-alt"></i></button>
+                                    <button onclick="modifyPoll(this,\'stop\', '.$r['PID'].')" style="color:white;background-color:#cd1f1f;margin: 0 0 20px 0;width: 92%;border:1px solid red;"><i class="fa fa-ban"></i> Stop Poll</button>';
                                 }else{
                                     echo '<select name="votingTime" id="" style="background-color: f1f1f1;width: 92%;">
                                         <option value="0">Select Voting period</option>
@@ -315,7 +338,7 @@
                                         <option value="4">Three Weeks</option>
                                         <option value="5">One Month</option>
                                     </select>
-                                    <button class="blue" style="margin: 0 0 20px 0;width: 92%;">Publish</button>';
+                                    <button onclick="modifyPoll(this,\'publish\', '.$r['PID'].')" class="blue" style="margin: 0 0 20px 0;width: 92%;">Publish</button>';
                                 }
                                 ?>
                             </div>
@@ -330,42 +353,30 @@
                 $answer = password_hash($_POST['securityAnswer'], PASSWORD_DEFAULT);
                 if(isset($_POST['name'])){
                     if(!$t->strValidate($_POST['name'],'!@') || !$t->strValidate($_POST['securityAnswer'],'!@')){
-                        echo json_encode(
+                        $message = empty($_POST['securityAnswer']) ? 'Security answer could not be empty':'Special characters not allowed!';
+                    }else{
+                        $question = intval($_POST['securityQuestion']);
+                        $t->query(
+                            'UPDATE BBVSUSERTABLE SET NAME = ?, SECURITYQUESTION = ?, SECURITYANSWER = ? WHERE USERNAME = ?',
                             [
-                                'result' => false,
-                                'error' => empty($_POST['securityAnswer']) ? 'Security answer could not be empty':'Special characters not allowed!'
+                                [&$_POST['name'],'s'],
+                                [&$question,'i'],
+                                [&$answer,'s'],
+                                [&$_SESSION['username'],'s']
                             ]
                         );
-                        return;
+                        if(false != $t->execute()){
+                            echo json_encode(
+                                [
+                                    'result' => true,
+                                    'message' => 'Profile updated'
+                                ]
+                            );
+                            return;
+                        }
+                        $message = 'Profile updatation failed';
                     }
-                    $question = intval($_POST['securityQuestion']);
-                    $t->query(
-                        'UPDATE BBVSUSERTABLE SET NAME = ?, SECURITYQUESTION = ?, SECURITYANSWER = ? WHERE USERNAME = ?',
-                        [
-                            [&$_POST['name'],'s'],
-                            [&$question,'i'],
-                            [&$answer,'s'],
-                            [&$_SESSION['username'],'s']
-                        ]
-                    );
-                    if(false != $t->execute()){
-                        echo json_encode(
-                            [
-                                'result' => true,
-                                'message' => 'Profile updated'
-                            ]
-                        );
-                        return;
-                    }
-                    echo json_encode(
-                        [
-                            'result' => true,
-                            'message' => 'Profile updatation failed'
-                        ]
-                    );
-                    return;
-                }
-                if(isset($_POST['updateprofile'])){
+                }elseif(isset($_POST['updateprofile'])){
                     $param = [
                         [&$_POST['securityQuestion'] , 'i'],
                         [&$answer, 's'],
@@ -393,11 +404,7 @@
                         return;
                     }
                 }
-                echo json_encode([
-                    'result' => false,
-                    'message' => 'Failed to update user'
-                ]);
-                return;
+                $message = 'Failed to update user';
             break;
             case 'uploadImage':
                 !isset($_SESSION['username']) ? die:'';
@@ -405,46 +412,32 @@
                 if(isset($_FILES['file']['name'])){
                     $img = $_FILES['file'];
                     if($img['size'] > 100000){
-                        echo json_encode(
-                            [
-                                'result'=>false,
-                                'error'=>'Image size should be less then 100kb'
-                            ]
-                        );
-                        return;
-                    }
-                    if(!in_array($img['type'],['image/jpeg','image/jpg','image/png'])){
-                        echo json_encode(
-                            [
-                                'result'=>false,
-                                'error'=>'Please select valid image file.'
-                            ]
-                        );
-                        return;
-                    }
-                    $ext = preg_replace('/.*\./','',$img['name']);
-                    $imgname = $_SESSION['username'].".$ext";
-                    if(move_uploaded_file(
-                        $img['tmp_name'],
-                        ROOTDIR.'/contents/img/profilepic/'.$imgname
-                    )){
-                        $t->query('UPDATE BBVSUSERTABLE SET IMAGE = ? WHERE USERNAME = ?',[
-                            [&$imgname,'s'],
-                            [&$_SESSION['username'],'s']
-                        ]);
-                        if(false != $t->execute()){
-                            echo json_encode(
-                                [
-                                    'result'=>true,
-                                    'message'=>'Image uploded successfully'
-                                ]
-                            );  
-                            return;
-                        }
-                        
-                    }   
+                        $message = 'Image size should be less then 100kb';
+                    }elseif(!in_array($img['type'],['image/jpeg','image/jpg','image/png'])){
+                        $message = 'Please select valid image file.';
+                    }else{
+                        $ext = preg_replace('/.*\./','',$img['name']);
+                        $imgname = $_SESSION['username'].".$ext";
+                        if(move_uploaded_file(
+                            $img['tmp_name'],
+                            ROOTDIR.'/contents/img/profilepic/'.$imgname
+                        )){
+                            $t->query('UPDATE BBVSUSERTABLE SET IMAGE = ? WHERE USERNAME = ?',[
+                                [&$imgname,'s'],
+                                [&$_SESSION['username'],'s']
+                            ]);
+                            if(false != $t->execute()){
+                                echo json_encode(
+                                    [
+                                        'result'=>true,
+                                        'message'=>'Image uploded successfully'
+                                    ]
+                                );  
+                                return;
+                            }
+                        } 
+                    }  
                 }
-                echo json_encode(['result'=>false, 'error'=>'internal error occured']);
             break;
             case 'userManagement':
                 if($_SESSION['role'] !== USERROLE::ADMIN) return;
@@ -529,5 +522,8 @@
             break;
         }
     }
-    echo 'false';
+    echo json_encode([
+        'result' => $result,
+        'message' => $message
+    ]);
 ?>

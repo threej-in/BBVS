@@ -118,7 +118,6 @@
     }
    $(()=>{
        error = {
-         loginid: false,
          captcha: false,
          password: false,
          answer:false   
@@ -146,22 +145,24 @@
             $('#answer_err').hide();
         });
         $('#btnsubmit').on('click',()=>{
-         $('input').blur();
-         if(error['loginid'] && error['password'] && error['captcha']){
-             if(document.getElementById('btnsubmit').name == "resetPassword"){
-                 if(error['answer']){
-                    $('#error').text('');
-                     $('form').submit();
-                 }else{
-                    $('#error').text('please enter all data ');
-                     return;
-                 }
-             }
-             $('#error').text('');
-           $('form').submit();
-        }else{
-            $('#error').text('please enter all data ');
-        }
+            $('input').blur();
+            console.log(error)
+            if(error['password'] && error['captcha']){
+                if(document.getElementById('btnsubmit').name == "reset-password"){
+                    
+                    if(error['answer']){
+                        $('#error').text('');
+                        $('form').submit();
+                    }else{
+                        $('#error').text('please enter all data ');
+                        return;
+                    }
+                }
+                $('#error').text('');
+                // $('form').submit();
+            }else{
+                $('#error').text('please enter all data ');
+            }
         });
     });
 </script>
@@ -213,7 +214,7 @@
                 <div class="flexrow">
                     <input style="min-width:50%;max-width:60%;" type="text" name="captcha" id="captcha" placeholder="Enter text as shown in image" required>
                     <img style="border: 1px solid grey;border-radius:5px;" src="<?php echo $t->getCaptcha();?>">
-                    <p id="captcha_err" class='red sm'></p>
+                    <p id="captcha_err" class='red sm' style="display: none;"></p>
                 </div>
             </section>
             <p class="red sm" id="error"><?php echo $error ?></p>

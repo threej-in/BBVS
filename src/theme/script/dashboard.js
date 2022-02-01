@@ -29,8 +29,7 @@ function showContent(request){
 }
 
 function validateImage(fileInput, upload = false, id ='profilepic', size = 100){
-    console.log(fileInput)
-    img = fileInput.files[0]
+    img = upload ? false : fileInput.files[0];
     if(typeof img === 'object'){
         if(img.size > size*1024){
             alert('Image size should be under 100kb');
@@ -44,9 +43,8 @@ function validateImage(fileInput, upload = false, id ='profilepic', size = 100){
         }
         $(`img[data-id=${id}]`).attr('src',URL.createObjectURL(img));
         $(`img[data-id=${id}]`).show()
-        
         fd.append('file', img);
-        fd.append('req','uploadImage');
+        fd.set('req','uploadImage');
         return
     }
 
@@ -56,11 +54,7 @@ function validateImage(fileInput, upload = false, id ='profilepic', size = 100){
             fd,
             (result)=>{
                 r = JSON.parse(result)
-                if(r['result']){
-                    alert(r['message']);
-                }else{
-                    alert(r['error'])
-                }
+                alert(r['message']);
             },
             (error)=>{
                 alert('Failed to uplaod image!')
@@ -176,6 +170,33 @@ function submitNewPoll(){
         (result)=>{
             r = JSON.parse(result);
             alert(r['message'])
+            if(r['result']){
+                $('#mypolls').click()
+            }
+        }
+    )
+}
+
+function modifyPoll(el, action,pid){
+    payload = {
+        req : 'modifyPoll',
+        pid : pid,
+        action : action
+    };
+    if(action =='publish'){
+        period = $(el).prev().val();
+        if(0 == period){
+            alert('Invalid period selected');
+            return
+        }
+        payload['period'] = period
+    }
+    callAjax(
+        AJAXURL,
+        payload,
+        (result)=>{
+            r = JSON.parse(result);
+            alert(r['message']);
             if(r['result']){
                 $('#mypolls').click()
             }
