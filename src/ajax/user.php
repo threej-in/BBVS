@@ -327,7 +327,7 @@
                                 if($r['STATUS']){
                                     $title = urlencode($r['POLLNAME']);
                                     echo '
-                                    <button class="blue" style="width: 92%;" onclick="location.href=\'page/created_poll.php?title='.$title.'\'">Cast your vote &nbsp;<i class="fa fa-external-link-alt"></i></button>
+                                    <button class="blue" style="width: 92%;" onclick="location.href=\'page/poll.php?title='.$title.'\'">Cast your vote &nbsp;<i class="fa fa-external-link-alt"></i></button>
                                     <button onclick="modifyPoll(this,\'stop\', '.$r['PID'].')" style="color:white;background-color:#cd1f1f;margin: 0 0 20px 0;width: 92%;border:1px solid red;"><i class="fa fa-ban"></i> Stop Poll</button>';
                                 }else{
                                     echo '<select name="votingTime" id="" style="background-color: f1f1f1;width: 92%;">
