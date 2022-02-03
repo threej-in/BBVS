@@ -4,32 +4,7 @@
 <html>
     <head>
         <meta charset="utf-8"/>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
-        <script>
-         $(document).ready(()=>{
-            var xValues = ["option1", "option2", "option3", "option4"];
-            var yValues = [55, 49, 44, 24];
-            var barColors = ["red", "green","blue","orange"];
-
-            new Chart("myChart", {
-            type: "bar",
-            data: {
-                labels: xValues,
-                datasets: [{
-                backgroundColor: barColors,
-                data: yValues
-                }]
-            },
-            options: {
-                legend: {display: false},
-                title: {
-                display: true,
-                text: "Result of Polls"
-                }
-            }
-            });
-         });
-        </script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <style>
             .ex{
                margin:-18.3% 0 0 75%;
@@ -80,22 +55,50 @@
                margin: 0% 0% 0% 20%; 
            }
 
-           .bio #mychart{
-               margin:1.5% 0 0 10%;
+            #mychart{
+               margin:1.5% 0 0 0%;
                position:absolute;
-               max-width:71%;
-               height: auto;
+               max-width:60%;
+               max-height:95%;
                
            }
         </style>
+        <script>
+            const name =['option1','option2','option3','options4'];
+            const value={
+                labels:name,
+                datasets:[{
+                  maxBarThinkcess:0,
+                  backgroundColor: 'rgb(255, 99, 132)',
+                  data:[20,50,80,10],
+                }],
+            };
+            const config={
+                type:'bar',
+                data:value,
+                options: {
+                 responsive:true,
+                 indexAxis: 'y',
+                 plugins: {
+                     legend: {
+                         display:false,
+                     },
+                     title: {
+                         display: true,
+                         text: 'RESULT OF POLL'
+                     }
+                   },
+                },
+            };
+        </script>
     </head>
     <body>
         <div class="bio">
             <img src="contents\img\profilepic\boy.jpg" alt="img">
             <p id="title"><b>Title</b></p>
             <label style="margin: -10% 0% 0% 25%;position:absolute " >Quetion:</label><p id="quetion" style="position:absolute;margin:-10% 0% 0% 32.5%;"> quetion </p>
-            <canvas id="myChart"></canvas> 
         </div>
+        <canvas id="myChart"></canvas> 
         <div class="ex">
          <?php for($i=0;$i<4;$i++){ ?>
          <div class="box">
@@ -104,5 +107,11 @@
          </div>
         <?php } ?>
      </div>
+     <script>
+         const chart = new Chart(
+                    document.getElementById('myChart'),
+                    config
+                ) ;
+     </script>
    </body>
 </html>
