@@ -1,16 +1,17 @@
 <?php
     require __DIR__.'/../theme/header.php';
     if(!isset($_SESSION['username'])) header('Location: login.php');
+    if(!isset($_GET['title'])) header('Location: index.php');
     $title = urldecode($_GET['title']);
-    $t->query('SELECT * FROM BBVSPOLLS WHERE POLLNAME LIKE ?', [[&$title,'s']]);
+    $t->query('SELECT * FROM BBVSPOLLS WHERE POLLNAME LIKE ? LIMIT 1', [[&$title,'s']]);
     if(false != $t->execute()){
         $poll = $t->fetch();
     }
 ?>
 <style>
-    
+    input{cursor: pointer;}
     .poll{
-        margin:0 0 0 10%;
+        margin:0 0 0 50px;
         width: 80%;
         background-color:#fff;
         border:1px solid rgba(0,0,0,0.2)k;
@@ -166,12 +167,19 @@
         </div>  
     </form> 
     <div class="suggestion-sidebar">
-        <?php for($i=0;$i<4;$i++){ ?>
-        <div class="box">
-            <img class="opimg" src="" alt="img">
-            <p class="quetion">title</p>
-        </div>
-    <?php } ?>
+        <h4 style="color: grey;margin:10px 0;">More active polls...</h4>
+        <?php
+        $t->query('SELECT * FROM BBVSPOLLS WHERE STATUS = 1 ORDER BY STARTDATE DESC LIMIT 5');
+        if(false != $t->execute()){
+            
+            while($poll = $t->fetch()){ 
+                echo '<div class="box" onclick="location.href=\'page/poll.php?'.urlencode($poll['POLLNAME']).'\'">
+                    <img class="opimg" src="contents/img/pollpic/'.$poll['POLLIMAGE'].'" alt="img">
+                    <p class="quetion">'.$poll['POLLNAME'].'</p>
+                </div>';
+            }
+        }
+        ?>
     </div>
 </div>
 <?php
