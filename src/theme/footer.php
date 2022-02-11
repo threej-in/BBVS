@@ -17,7 +17,7 @@
             }
         </style>
         <footer>
-            <div class="flexrow widget">
+            <div class="flexrow flexass widget">
                 <div class="flexcol flexass">
                     <img class="logo brad50" style="box-shadow:0 0 2px 3px;" src="theme/img/logo.png" alt="Blockchain Based Voting system" height="50px" width="50px">
                     <h3>BBVS</h3>
@@ -33,7 +33,7 @@
                     <ul style="list-style: none;" class="md">
                         <li><a href="index.php">Home</a></li>
                         <li><a href="page/dashboard.php">Dashboard</a></li>
-                        <li>Result</li>
+                        <li><a href="page/result.php">Result</a></li>
                     </ul>
                 </div>
                 <div class="flexcol flexass">

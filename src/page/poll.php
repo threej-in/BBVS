@@ -1,7 +1,7 @@
 <?php
     require __DIR__.'/../theme/header.php';
     if(!isset($_SESSION['username'])) header('Location: login.php');
-    if(!isset($_GET['title'])) header('Location: index.php');
+    if(!isset($_GET['title'])) header('Location: ../index.php');
     $title = urldecode($_GET['title']);
     $t->query('SELECT * FROM BBVSPOLLS WHERE POLLNAME LIKE ? LIMIT 1', [[&$title,'s']]);
     if(false != $t->execute()){
@@ -11,25 +11,24 @@
 <style>
     input{cursor: pointer;}
     .poll{
-        margin:0 0 0 50px;
-        width: 80%;
+        margin: 0 auto;
+        width: 90%;
         background-color:#fff;
         border:1px solid rgba(0,0,0,0.2)k;
         border-radius: 3px;
-        box-shadow: 5px 5px 30px rgba(0,0,0,0.2);
+        box-shadow: 0px 0px 10px rgb(0 0 0 / 20%);
     }
     .quetion{
+        color:var(--dark);
         font-weight: bold;
-        margin-bottom:4%;
         align-items: center;
         position:relative;
         padding:3% 3% 4% 5%;
     }
     .poll .quetion{
         font-weight: bold;
-        margin-bottom:4%;
         position:relative;
-        padding:7% 3% 4% 5%;
+        padding:30px;
         border-bottom:2px solid rgba(0,0,0,0.2);
     }
     .poll .answers{
@@ -89,42 +88,35 @@
         width: fit-content;
     }
     img.opimg{
-        object-fit:cover;
+        object-fit: fill;
         position: relative;
-        margin-top:0%;
-        margin-left:0%;
         width:100%;
         height: 13em;
         border-bottom:4px solid rgba(0,0,0,0.2);
         border-radius: 4px;
-
     }
     form{
         position:relative;
         width: 65%;
     }
-    .suggestion-sidebar{
-        width: 30%;
-    }
     .box{
+        width: 100%;
         cursor:pointer;
-        margin-bottom:15%;
+        margin:5px 10px 30px 5px;
         position:relative;
         display:block;
         border-radius:4px;
         background-color:rgba(0,0,0,0.2);
+        box-shadow: 0px 0px 10px rgb(0 0 0 / 20%);
     }
     .title{
-        margin-top:-10%;
-        margin-left:5%;
-        padding:10px;
-        position:relative;
-        width:90%;
-        background-color:rgb(1,1,1,0.6);
-        color:white;
-        border:2px solid white;
+        padding: 10px;
+        position: absolute;
+        width: 100%;
+        background-color: rgb(1 1 1 / 42%);
+        color: white;
+        bottom: 0;
     }
-
 </style>
 <script>
     $(document).ready(()=>{
@@ -141,14 +133,18 @@
     }  
     });
 </script>
+<div class="flexrow">
+    <p style="font-weight:700;color: grey;width:65%;margin:20px 0;font-size:22px;padding-left:40px;">Caste your vote for <?php echo $poll['POLLNAME'] ?></p>
+    <p style="font-weight:700;color: grey;margin:20px 0 20px 0;font-size:22px;">More active polls...</p>
+</div>
 <div class="flexrow flexass">
+    
     <form method="POST">
         <div class="poll">
-            <img class="opimg" src="contents/img/pollpic/<?php echo $poll['POLLIMAGE'] ?>" alt="img">
-            <div class="title">
-            <p><?php echo $poll['POLLNAME'] ?></p>
+            <div class="banner">
+                <img class="opimg" src="contents/img/pollpic/<?php echo $poll['POLLIMAGE'] ?>" alt="img">
+                <p class="title"><?php echo $poll['POLLNAME'] ?></p>
             </div>
-            
             <p class="quetion"><?php echo $poll['DESCRIPTION'] ?></p>
             <div class="flexcol flexass options">
                 <p class="md" style="color:grey;">Choose your answer</p>
@@ -165,15 +161,14 @@
             </div>
             <button type="submit" id='btn_submit' style="background-color:var(--blue);color:#fff;font-weight:bold">Submit</button>
         </div>  
-    </form> 
-    <div class="suggestion-sidebar">
-        <h4 style="color: grey;margin:10px 0;">More active polls...</h4>
+    </form>
+    <div class="flexrow" style="width: 33%;height:80vh;overflow-y:scroll;">
         <?php
         $t->query('SELECT * FROM BBVSPOLLS WHERE STATUS = 1 ORDER BY STARTDATE DESC LIMIT 5');
         if(false != $t->execute()){
             
             while($poll = $t->fetch()){ 
-                echo '<div class="box" onclick="location.href=\'page/poll.php?'.urlencode($poll['POLLNAME']).'\'">
+                echo '<div class="box" onclick="location.href=\'page/poll.php?title='.urlencode($poll['POLLNAME']).'\'">
                     <img class="opimg" src="contents/img/pollpic/'.$poll['POLLIMAGE'].'" alt="img">
                     <p class="quetion">'.$poll['POLLNAME'].'</p>
                 </div>';

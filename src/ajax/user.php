@@ -266,10 +266,9 @@
                     .individual-polls .title{
                         position: absolute;
                         bottom: 0;
-                        margin: 0 15px;
                         background-color: #ffffffd1;
-                        padding: 10px 0;
-                        width: 94%;
+                        padding: 10px;
+                        width: 100%;
                         box-shadow: 0px -7px 21px 9px #ffffffd1;
                     }
                     .individual-polls .options{
@@ -333,10 +332,10 @@
                                     echo '<select name="votingTime" id="" style="background-color: f1f1f1;width: 92%;">
                                         <option value="0">Select Voting period</option>
                                         <option value="1">One Day</option>
-                                        <option value="2">One Week</option>
-                                        <option value="3">Two Weeks</option>
-                                        <option value="4">Three Weeks</option>
-                                        <option value="5">One Month</option>
+                                        <option value="7">One Week</option>
+                                        <option value="14">Two Weeks</option>
+                                        <option value="21">Three Weeks</option>
+                                        <option value="30">One Month</option>
                                     </select>
                                     <button onclick="modifyPoll(this,\'publish\', '.$r['PID'].')" class="blue" style="margin: 0 0 20px 0;width: 92%;">Publish</button>';
                                 }
