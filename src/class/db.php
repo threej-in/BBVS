@@ -84,5 +84,18 @@ abstract class threejdb{
         }
         return $this->result->fetch_assoc();
     }
+    /**
+     * @return array returns mysqli result as an associative array
+     */
+    function fetchAll(){
+        if($this->result == NULL || 'object' != gettype($this->result)){
+            return [];
+        }
+        $result = [];
+        while($data = $this->result->fetch_assoc()){
+            $result[] = $data;
+        }
+        return $result;
+    }
 }
 ?>

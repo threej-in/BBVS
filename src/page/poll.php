@@ -1,12 +1,71 @@
 <?php
+
     require __DIR__.'/../theme/header.php';
+    $t->query('SELECT PID,OPTIONS FROM BBVSPOLLS ');
+
     if(!isset($_SESSION['username'])) header('Location: login.php');
-    if(!isset($_GET['title'])) header('Location: ../index.php');
-    $title = urldecode($_GET['title']);
-    $t->query('SELECT * FROM BBVSPOLLS WHERE POLLNAME LIKE ? LIMIT 1', [[&$title,'s']]);
-    if(false != $t->execute()){
-        $poll = $t->fetch();
+    $error = '';
+    if(isset($_POST['pollid']) && isset($_SESSION['UID'])){
+        if(isset($_POST['vote']) && !empty($_POST['vote'])){
+            if(isset($_POST['securityAnswer']) && !empty($_POST['securityAnswer'])){
+                $t->query('SELECT SECURITYANSWER FROM BBVSUSERTABLE WHERE UID = ?',[[&$_SESSION["UID"],'i']]);
+                if(false != $t->execute()){
+                    if(password_verify($_POST['securityAnswer'],$t->fetch()['SECURITYANSWER'])){
+                        if(password_verify($t->addSalt($_POST['pollid']), $_POST['signature'])){
+                            $votehash = hash('sha256',$_POST['securityAnswer'] . $_POST['vote']);
+                            $t->query('INSERT INTO BBVSVOTES SET UID = ?, PID = ?, VOTEHASH = ?',[
+                                [&$_SESSION['UID'],'i'],
+                                [&$_POST['pollid'],'i'],
+                                [&$votehash,'s']
+                            ]);
+                            if(false!=$t->execute()){
+                                $t->query('SELECT PID, VOTECOUNT FROM BBVSPOLLS WHERE PID = ?',[[&$_POST['pollid'],'i']]);
+                                if(false != $t->execute()){
+                                    $data = $t->fetch();
+                                    $arr = json_decode($data['VOTECOUNT']);
+                                    $arr[$_POST['vote']-1] += 1;
+                                    $json = json_encode($arr);
+                                    $t->query('UPDATE BBVSPOLLS SET VOTECOUNT = ? WHERE PID = ?',[
+                                        [&$json,'s'],
+                                        [&$data['PID'],'i']
+                                    ]);
+                                    if(false!= $t->execute() && $t->affected_rows == 1){
+                                        header('Location: result.php?vote=success&title='.$_POST['pollname']);
+                                        return;
+                                    }else{
+                                        $error = 'Internal error occured';
+                                    }
+                                }else{
+                                    $error = 'Internal error occured';
+                                }
+                            }else{
+                                $error = 'Unable to caste your vote. Duplicate votes are not allowed!';
+                            }
+                        }else{
+                            $error = 'Signature verification failed.';
+                        }
+                    }else{
+                        $error = 'Security answer is incorrect.';
+                    }
+                }
+            }else{
+                $error = 'Security Answer is required.';
+            }
+        }else{
+            $error = 'Please choose an option to vote.';
+        }
+        
     }
+    if(!isset($_GET['title'])) header('Location: ../index.php');
+
+    $title = urldecode($_GET['title']);
+    $t->query('SELECT a.*, b.SECURITYQUESTION FROM BBVSPOLLS AS a, BBVSUSERTABLE AS b WHERE a.POLLNAME LIKE ? AND b.UID = ? LIMIT 1', [[&$title,'s'],[&$_SESSION['UID'],'i']]);
+    if(false != $t->execute() && $t->affected_rows == 1){
+        $poll = $t->fetch();
+    }else{
+        header('Location: ../index.php');
+    }
+    if($poll['STATUS'] === 0) header('Location: result.php?title='.$_GET['title']);
 ?>
 <style>
     input{cursor: pointer;}
@@ -81,8 +140,8 @@
         color:#6665ee;
     }
     .options{
-        width: 90%;
         padding: 30px;
+        border-bottom: 2px solid rgba(0,0,0,0.2);
     }
     input[type="radio"]{
         width: fit-content;
@@ -102,7 +161,7 @@
     .box{
         width: 100%;
         cursor:pointer;
-        margin:5px 10px 30px 5px;
+        margin:5px 10px 0px 5px;
         position:relative;
         display:block;
         border-radius:4px;
@@ -110,7 +169,7 @@
         box-shadow: 0px 0px 10px rgb(0 0 0 / 20%);
     }
     .title{
-        padding: 10px;
+        padding: 10px 30px;
         position: absolute;
         width: 100%;
         background-color: rgb(1 1 1 / 42%);
@@ -120,17 +179,18 @@
 </style>
 <script>
     $(document).ready(()=>{
-    const option = $("label");
-    for(let i=0;i<option.length;i++){
-        $(option[i]).on('click',()=>{ 
-            for(let j=0;j<option.length;j++){
-            if($(option[j]).hasClass('selected')){
-                $(option[j]).removeClass('selected');
-            }   
+        $('div.sidebar').css('height',$('div.poll').height())
+        const option = $("label");
+        for(let i=0;i<option.length;i++){
+            $(option[i]).on('click',()=>{ 
+                for(let j=0;j<option.length;j++){
+                if($(option[j]).hasClass('selected')){
+                    $(option[j]).removeClass('selected');
+                }   
+            }
+            $(option[i]).addClass('selected');
+            });
         }
-        $(option[i]).addClass('selected');
-        });
-    }  
     });
 </script>
 <div class="flexrow">
@@ -139,7 +199,7 @@
 </div>
 <div class="flexrow flexass">
     
-    <form method="POST">
+    <form method="POST" action="page/poll.php?title=<?php echo urlencode($poll['POLLNAME']) ?>">
         <div class="poll">
             <div class="banner">
                 <img class="opimg" src="contents/img/pollpic/<?php echo $poll['POLLIMAGE'] ?>" alt="img">
@@ -149,24 +209,35 @@
             <div class="flexcol flexass options">
                 <p class="md" style="color:grey;">Choose your answer</p>
                 <?php
+                    $signature = password_hash($t->addSalt($poll['PID']),PASSWORD_DEFAULT);
+                    echo '
+                    <input type="hidden" name="pollname" value="'. urlencode($poll['POLLNAME']).'">
+                    <input type="hidden" name="pollid" value="'.$poll['PID'].'">
+                    <input type="hidden" name="signature" value="'.$signature.'">';
                     $options = json_decode($poll['OPTIONS']);
                     foreach($options as $k => $v){
                         echo 
                         '<div class="flexrow">
-                            <input type="radio" name="vote" id="">
-                            <label class="md">'.$v.'</label>
+                            <input type="radio" name="vote" value="'.($k+1).'" id="'.$k.'">
+                            <label class="md" for="'.$k.'">'.$v.'</label>
                         </div>';
                     }
+                    echo '</div>
+                    <div style="padding:0 30px;" class="flexcol flexass">
+                        <hr><span class="md">Q. '.SETTINGS::securityQuestion[$poll['SECURITYQUESTION']].'</span>
+                        <input type="text" name="securityAnswer" placeholder="Enter answer to your security question" required></input>
+                        <span class="red md">'.$error.'</span>
+                        <span class="sm"><i class="fa fa-clock"></i> Poll end date '.date('d M \a\t h:i a',$poll['STARTDATE'] + ($poll['PERIOD'])*24*3600).'</span>
+                    </div>';
                 ?>
-            </div>
+            
             <button type="submit" id='btn_submit' style="background-color:var(--blue);color:#fff;font-weight:bold">Submit</button>
         </div>  
     </form>
-    <div class="flexrow" style="width: 33%;height:80vh;overflow-y:scroll;">
+    <div class="sidebar flexrow" style="width: 33%;height:1000px;overflow-y:scroll;">
         <?php
-        $t->query('SELECT * FROM BBVSPOLLS WHERE STATUS = 1 ORDER BY STARTDATE DESC LIMIT 5');
+        $t->query('SELECT * FROM BBVSPOLLS WHERE STATUS = 1 AND PID <> ? ORDER BY STARTDATE DESC LIMIT 5',[[&$poll['PID'],'i']]);
         if(false != $t->execute()){
-            
             while($poll = $t->fetch()){ 
                 echo '<div class="box" onclick="location.href=\'page/poll.php?title='.urlencode($poll['POLLNAME']).'\'">
                     <img class="opimg" src="contents/img/pollpic/'.$poll['POLLIMAGE'].'" alt="img">

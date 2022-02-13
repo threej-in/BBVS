@@ -81,7 +81,6 @@
         color:#6665ee;
     }
     .options{
-        width: 90%;
         padding: 30px;
     }
     input[type="radio"]{
@@ -102,7 +101,7 @@
     .box{
         width: 100%;
         cursor:pointer;
-        margin:5px 10px 30px 5px;
+        margin:5px 10px 0px 5px;
         position:relative;
         display:block;
         border-radius:4px;
@@ -110,7 +109,7 @@
         box-shadow: 0px 0px 10px rgb(0 0 0 / 20%);
     }
     .title{
-        padding: 10px;
+        padding: 10px 30px;
         position: absolute;
         width: 100%;
         background-color: rgb(1 1 1 / 42%);
@@ -145,17 +144,18 @@
 </style>
 <script>
     $(document).ready(()=>{
-    const option = $("label");
-    for(let i=0;i<option.length;i++){
-        $(option[i]).on('click',()=>{ 
-            for(let j=0;j<option.length;j++){
-            if($(option[j]).hasClass('selected')){
-                $(option[j]).removeClass('selected');
-            }   
+        $('div.sidebar').css('height',$('div.poll').height())
+        const option = $("label");
+        for(let i=0;i<option.length;i++){
+            $(option[i]).on('click',()=>{ 
+                for(let j=0;j<option.length;j++){
+                if($(option[j]).hasClass('selected')){
+                    $(option[j]).removeClass('selected');
+                }   
+            }
+            $(option[i]).addClass('selected');
+            });
         }
-        $(option[i]).addClass('selected');
-        });
-    }
     });
 </script>
 <div class="flexrow">
@@ -163,7 +163,6 @@
     <p style="font-weight:700;color: grey;margin:20px 0 20px 0;font-size:22px;">Recently ended polls...</p>
 </div>
 <div class="flexrow flexass">
-    
     <form method="POST">
         <div class="poll">
             <div class="banner">
@@ -186,9 +185,9 @@
             </div>
         </div>  
     </form>
-    <div class="flexrow" style="width: 33%;height:80vh;overflow-y:scroll;">
+    <div class="flexrow sidebar" style="width: 33%;height:1000px;overflow-y:scroll;">
         <?php
-        $t->query('SELECT * FROM BBVSPOLLS WHERE STATUS = 1 ORDER BY STARTDATE DESC LIMIT 5');
+        $t->query('SELECT * FROM BBVSPOLLS WHERE STATUS = 0 AND PID <> ? ORDER BY STARTDATE DESC LIMIT 5',[[&$poll['PID'],'i']]);
         if(false != $t->execute()){
             while($poll = $t->fetch()){ 
                 echo '<div class="box" onclick="location.href=\'page/poll.php?title='.urlencode($poll['POLLNAME']).'\'">

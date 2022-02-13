@@ -42,12 +42,15 @@
                     $ext = preg_replace('/.*\./','.',$_FILES['pollImage']['name']);
                     $image = $_SESSION['UID'].$time.$ext;
                     $options = [];
+                    $voteCount = [];
                     foreach($_POST as $k => $v){
                         if(preg_match('/option\d/',$k)){
                             $options[] = $v;
+                            $voteCount[] = 0;
                         }
                     }
                     $options = json_encode($options);
+                    $voteCount = json_encode($voteCount);
                     $values =[
                         [&$_POST['pollTitle'],'s'],
                         [&$_POST['pollDescription'],'s'],
@@ -55,8 +58,9 @@
                         [&$image,'s'],
                         [&$time,'i'],
                         [&$_SESSION['UID'],'i'],
+                        [&$voteCount,'s']
                     ];
-                    $t->query('INSERT INTO BBVSPOLLS(POLLNAME, DESCRIPTION, OPTIONS, POLLIMAGE,  CREATEDON, CREATEDBY) VALUES(?,?,?,?,?,?)',$values);
+                    $t->query('INSERT INTO BBVSPOLLS(POLLNAME, DESCRIPTION, OPTIONS, POLLIMAGE,  CREATEDON, CREATEDBY, VOTECOUNT) VALUES(?,?,?,?,?,?,?)',$values);
                     if(false !== $t->execute()){
                         $result = true;
                         $error = 'Poll created successfully!';
