@@ -122,6 +122,9 @@
         overflow: hidden;
     }
     div.option span{
+        display: flex;
+        align-items: center;
+        height: 100%;
         position: absolute;
         right: 0;
         font-size: 18px;
@@ -159,7 +162,7 @@
     });
 </script>
 <div class="flexrow">
-    <p style="font-weight:700;color: grey;width:65%;margin:20px 0;font-size:22px;padding-left:40px;">Poll Result</p>
+    <p style="font-weight:700;color: #eba11b;width:65%;margin:20px 0;font-size:22px;padding-left:40px;"><i class="fa fa-trophy"></i> Poll Result</p>
     <p style="font-weight:700;color: grey;margin:20px 0 20px 0;font-size:22px;">Recently ended polls...</p>
 </div>
 <div class="flexrow flexass">
@@ -171,13 +174,25 @@
             </div>
             <p class="quetion"><?php echo $poll['DESCRIPTION'] ?></p>
             <div class="flexcol flexass options">
+                <div class="flexrow option" style="color: grey;">
+                    <p>Options/Candidates</p>
+                    <span>No of votes</span>
+                </div>
                 <?php
                     $options = json_decode($poll['OPTIONS']);
+                    $votecount = json_decode($poll['VOTECOUNT']);
+                    $total=1;
+                    $winner=-1;
+                    foreach($votecount as $k => $v){
+                        $total += $v;
+                        $v > $winner ? $winner = $v :0;
+                    }
                     foreach($options as $k => $v){
+                        $percentage = ( $votecount[$k] / $total ) * 100;
                         echo 
                         '<div class="flexrow option">
-                            <label class="md gn-option">'.$v.'</label>
-                            <span>50%</span>
+                            <label class="'.($votecount[$k] == $winner ? 'wn-option': 'gn-option').' md" style="width:'.$percentage.'%;">'.$v.'</label>
+                            <span>'.$votecount[$k].'</span>
                         </div>';
                     }
                     echo '<hr><span class="sm"><i class="fa fa-clock"></i> Poll end date '.date('d M \a\t h:i a',$poll['STARTDATE'] + ($poll['PERIOD'])*24*3600).'</span>';

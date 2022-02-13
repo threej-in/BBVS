@@ -77,6 +77,9 @@ if(false == $t->execute()){
         overflow: hidden;
     }
     div.option span{
+        display: flex;
+        align-items: center;
+        height: 100%;
         position: absolute;
         right: 0;
         font-size: 18px;
@@ -121,14 +124,26 @@ if(false == $t->execute()){
                 <!-- <p class="md" style="color:grey;">Options</p> -->
                 <?php
                     $options = json_decode($r['OPTIONS']);
+                    $votecount = json_decode($r['VOTECOUNT']);
+                    $total=0;
+                    $winner=-1;
+                    foreach($votecount as $k => $v){
+                        $total += $v;
+                        $v > $winner ? $winner = $v :0;
+                    }
                     foreach($options as $k => $v){
+                        $percentage = $total > 0 ? ( $votecount[$k] / $total ) * 100 : 0;
                         echo 
                         '<div class="flexrow option">
-                            <label class="md gn-option">'.$v.'</label>
-                            <span>50%</span>
+                            <label class="'.($votecount[$k] == $winner ? 'wn-option': 'gn-option').' md" style="width:'.$percentage.'%;">'.$v.'</label>
+                            <span>'.$percentage.'%</span>
                         </div>';
                     }
-                    echo '<hr><span class="sm"><i class="fa fa-clock"></i> Ending on '.date('d M \a\t h:i a',$r['STARTDATE']).'</span>';
+                    echo '<hr><span class="sm"><i class="fa fa-clock"></i> Ending on '.date('d M \a\t h:i a',$r['STARTDATE']).'</span>
+                    <button class="blue"><i class="fa fa-poll"></i> Vote</button>
+                    <button class="blue" onclick="event.stopPropagation();location.href=\'page/result.php?title='.urlencode($r['POLLNAME']).'\';"><i class="fa fa-eye"></i> Result</button>';
+                    
+                    
                 ?>
             </div>
         </div>
@@ -156,11 +171,19 @@ if(false == $t->execute()){
                     <!-- <p class="md" style="color:grey;">Options</p> -->
                     <?php
                         $options = json_decode($r['OPTIONS']);
+                        $votecount = json_decode($r['VOTECOUNT']);
+                        $total=0;
+                        $winner=-1;
+                        foreach($votecount as $k => $v){
+                            $total += $v;
+                            $v > $winner ? $winner = $v :0;
+                        }
                         foreach($options as $k => $v){
+                            $percentage = $total > 0 ? ( $votecount[$k] / $total ) * 100 : 0;
                             echo 
                             '<div class="flexrow option">
-                                <label class="md gn-option">'.$v.'</label>
-                                <span>50%</span>
+                                <label class="'.($votecount[$k] == $winner ? 'wn-option': 'gn-option').' md" style="width:'.$percentage.'%;">'.$v.'</label>
+                                <span>'.$percentage.'%</span>
                             </div>';
                         }
                         echo '<hr><span class="sm"><i class="fa fa-clock"></i> Ended on '.date('d M \a\t h:i a',$r['STARTDATE']).'</span>';
