@@ -90,7 +90,7 @@
             <hr style="height: 1px; background-color:lightgrey;margin:0;">
             <li id="newpoll" onclick="showContent('newPoll')"><i class="fa fa-plus fa-md"></i> Create New Poll</li>
             <li id="mypolls" onclick="showContent('showPolls')"><i class="fa fa-poll fa-sm"></i> My Polls</li>
-            <li><i class="fa fa-vote-yea fa-xs"></i> My Votes</li>
+            <li id="myvotes" onclick="showContent('showVotes')"><i class="fa fa-vote-yea fa-xs"></i> My Votes</li>
             <?php
                 if(isset($_SESSION['role']) && $_SESSION['role'] == USERROLE::ADMIN){
                     echo '<li onclick="showContent(\'userManagement\')"><i class="fa fa-users-cog fa-xs"></i> User Management</li>

@@ -181,14 +181,14 @@
                 <?php
                     $options = json_decode($poll['OPTIONS']);
                     $votecount = json_decode($poll['VOTECOUNT']);
-                    $total=1;
+                    $total=0;
                     $winner=-1;
                     foreach($votecount as $k => $v){
                         $total += $v;
                         $v > $winner ? $winner = $v :0;
                     }
                     foreach($options as $k => $v){
-                        $percentage = ( $votecount[$k] / $total ) * 100;
+                        $percentage = $total > 0 ? ( $votecount[$k] / $total ) * 100 : 0;
                         echo 
                         '<div class="flexrow option">
                             <label class="'.($votecount[$k] == $winner ? 'wn-option': 'gn-option').' md" style="width:'.$percentage.'%;">'.$v.'</label>

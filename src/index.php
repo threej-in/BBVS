@@ -1,5 +1,9 @@
 <?php
 require __DIR__.'/theme/header.php';
+//change status of expired polls
+$t->query('UPDATE bbvspolls set STATUS = 0 where STARTDATE + (PERIOD * 24 * 3600) < '.time());
+$t->execute();
+
 $t->query('SELECT * FROM BBVSPOLLS WHERE STATUS =1 ORDER BY STARTDATE DESC');
 if(false == $t->execute()){
     echo '<p class="red">Unable to fetch polls</p>';
@@ -139,11 +143,9 @@ if(false == $t->execute()){
                             <span>'.$percentage.'%</span>
                         </div>';
                     }
-                    echo '<hr><span class="sm"><i class="fa fa-clock"></i> Ending on '.date('d M \a\t h:i a',$r['STARTDATE']).'</span>
+                    echo '<hr><span class="sm"><i class="fa fa-clock"></i> Poll end date '.date('d M \a\t h:i a',$r['STARTDATE']).'</span>
                     <button class="blue"><i class="fa fa-poll"></i> Vote</button>
-                    <button class="blue" onclick="event.stopPropagation();location.href=\'page/result.php?title='.urlencode($r['POLLNAME']).'\';"><i class="fa fa-eye"></i> Result</button>';
-                    
-                    
+                    <button class="blue" onclick="event.stopPropagation();location.href=\'page/result.php?title='.urlencode($r['POLLNAME']).'\';"><i class="fa fa-eye"></i> Result</button>';  
                 ?>
             </div>
         </div>
@@ -186,7 +188,7 @@ if(false == $t->execute()){
                                 <span>'.$percentage.'%</span>
                             </div>';
                         }
-                        echo '<hr><span class="sm"><i class="fa fa-clock"></i> Ended on '.date('d M \a\t h:i a',$r['STARTDATE']).'</span>';
+                        echo '<hr><span class="sm"><i class="fa fa-clock"></i> Poll end date '.date('d M \a\t h:i a',$r['STARTDATE']).'</span>';
                     ?>
                 </div>
             </div>
