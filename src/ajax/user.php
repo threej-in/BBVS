@@ -141,6 +141,76 @@
                 <?php
                 return;
             break;
+            case 'pollManagement':
+                if($_SESSION['role'] !== USERROLE::ADMIN && $_SESSION['role'] !== USERROLE::MODERATOR) return;
+                
+                $t->query('SELECT a.*,b.USERNAME FROM `bbvspolls` as a, bbvsusertable as b WHERE a.CREATEDBY = b.UID AND a.STATUS = 1 LIMIT 50');
+                $t->execute();
+                
+                echo '
+                    <h2 style="color: var(--grey);text-align:center;">Polls management</h2>
+                    <hr style="height:25px;">
+                    <ul class="info">
+                        <li>You can change status of public polls</li>
+                        <li>You can remove duplicate or invalid polls</li>
+                    </ul>
+                    <hr>
+                    <table>
+                        <tr>
+                            <th>#</th>
+                            <th>Poll Name & Description</th>
+                            <th>CreatedBy</th>
+                            <th>Status</th>
+                            <th>Period</th>
+                            <th>Start Date</th>
+                            <th>Action</th>
+                        </tr>';
+                $i=1;
+                $pollStatus = [
+                    'Inactive','Active'
+                ];
+                $period = [
+                    1 => 'One Day',
+                    7 => 'One Week',
+                    14 => 'Two Week',
+                    21 => 'Three Week',
+                    30 => 'One Month'
+                ];
+                while($r = $t->fetch()){
+                ?>
+                    <tr>
+                        <td><?php echo $i++ ?></td>
+                        <td>
+                            <?php echo '<h4>' .$r['POLLNAME'] .'</h4>
+                            <h6>' .$r['DESCRIPTION'] .'</h6>' ?>
+                        </td>
+                        <td>@<?php echo $r['USERNAME'] ?></td>
+                        <td>
+                            <select name="status">
+                                <?php
+                                    foreach($pollStatus as $k => $v){
+                                        if($r['STATUS'] == $k)
+                                            echo '<option value="'.$k.'" selected>'.$v.'</option>';
+                                        else
+                                            echo '<option value="'.$k.'">'.$v.'</option>';
+                                    }
+                                ?>
+
+                            </select>
+                        </td>
+                        <td><?php echo $period[$r['PERIOD']] ?></td>
+                        <td><?php echo date('d M Y',$r['STARTDATE']) ?></td>
+                        <td>
+                            <button style="color: seagreen;" onclick="updatePoll(this)" data-pid="<?php echo $r['PID']?>">Update</button>
+                            <button onclick="removePoll(this)" data-pid="<?php echo $r['PID']?>">Remove</button>
+                        </td>
+                    </tr>
+                    
+                <?php
+                }
+                echo '</table>';
+                return;
+            break;
             case 'profile':
                 !isset($_SESSION['username']) ? die:'';
                 $t->query('SELECT * FROM BBVSUSERTABLE WHERE USERNAME = ?',[[&$_SESSION['username'],'s']]);
@@ -200,21 +270,45 @@
             break;
             case 'removeUser':
                 if($_SESSION['role'] == USERROLE::ADMIN){
-                    $t->query('DELETE FROM BBVSUSERTABLE WHERE UID = ? && (ROLE = ? || ROLE = ?)',
-                    [
-                        [&$_POST['uid'],'i'],
-                        [USERROLE::MODERATOR,'i'],
-                        [USERROLE::USER,'i']
-                    ]);
-                    if(false !== $t->execute() && $t->affected_rows == 1){
-                        echo json_encode([
-                            'result' => true,
-                            'message' => 'User removed'
+                    $t->query('SELECT IMAGE FROM BBVSUSERTABLE WHERE UID = ?',[[&$_POST['uid'],'i']]);
+                    if(false != $t->execute()){
+                        $userdata = $t->fetch();
+                        $t->query('DELETE FROM BBVSUSERTABLE WHERE UID = ? && (ROLE = ? || ROLE = ?)',
+                        [
+                            [&$_POST['uid'],'i'],
+                            [USERROLE::MODERATOR,'i'],
+                            [USERROLE::USER,'i']
                         ]);
-                        return;
+                        if(false !== $t->execute() && $t->affected_rows == 1){
+                            if($userdata['IMAGE'] != 'boy.jpg' && $userdata['IMAGE'] != 'girl.jpg')
+                                unlink(ROOTDIR.'contents/img/profilepic/'.$userdata['IMAGE']);
+                            echo json_encode([
+                                'result' => true,
+                                'message' => 'User removed'
+                            ]);
+                            return;
+                        }
                     }
                 }
                 $message = 'Failed to remove user';
+            break;
+            case 'removePoll':
+                if($_SESSION['role'] == USERROLE::ADMIN || $_SESSION['role'] == USERROLE::MODERATOR){
+                    $t->query('SELECT POLLIMAGE FROM BBVSPOLLS WHERE PID = ?',[[&$_POST['pid'],'i']]);
+                    if(false != $t->execute()){
+                        $polldata = $t->fetch();
+                        $t->query('DELETE FROM BBVSPOLLS WHERE PID = ?',[[&$_POST['pid'],'i']]);
+                        if(false !== $t->execute() && $t->affected_rows == 1){
+                            unlink(ROOTDIR.'contents/img/pollpic/'.$polldata['POLLIMAGE']);
+                            echo json_encode([
+                                'result' => true,
+                                'message' => 'Poll removed'
+                            ]);
+                            return;
+                        }    
+                    }    
+                }
+                $message = 'Failed to remove poll';
             break;
             case 'securityQuestion':
                 if(!isset($_POST['loginid'])){
@@ -482,6 +576,23 @@
                 <hr style="height: 20px;">
                 <?php
                 return;
+            break;
+            case 'updatePoll':
+                if($_SESSION['role'] == USERROLE::ADMIN || $_SESSION['role'] == USERROLE::MODERATOR){
+                    $t->query('UPDATE BBVSPOLLS SET STATUS = ? WHERE PID = ?',
+                    [
+                        [&$_POST['status'],'i'],
+                        [&$_POST['pid'],'i']
+                    ]);
+                    if(false !== $t->execute() && $t->affected_rows == 1){
+                        echo json_encode([
+                            'result' => true,
+                            'message' => 'Poll updated successfuly'
+                        ]);
+                        return;
+                    }
+                }
+                $message = 'Failed to update poll';
             break;
             case 'updateProfile':
                 $answer = password_hash($_POST['securityAnswer'], PASSWORD_DEFAULT);

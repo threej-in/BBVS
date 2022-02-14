@@ -94,9 +94,9 @@
             <?php
                 if(isset($_SESSION['role']) && $_SESSION['role'] == USERROLE::ADMIN){
                     echo '<li onclick="showContent(\'userManagement\')"><i class="fa fa-users-cog fa-xs"></i> User Management</li>
-                        <li><i class="fa fa-sliders-h fa-xs"></i> Polls Management</li>';
+                        <li onclick="showContent(\'pollManagement\')"><i class="fa fa-sliders-h fa-xs"></i> Polls Management</li>';
                 }elseif(isset($_SESSION['role']) && $_SESSION['role'] == USERROLE::MODERATOR){
-                    echo '<li><i class="fa fa-sliders-h fa-xs"></i> Polls Management</li>';
+                    echo '<li onclick="showContent(\'pollManagement\')"><i class="fa fa-sliders-h fa-xs"></i> Polls Management</li>';
                 }
             ?>
             <li id="profile" onclick="showContent('profile')"><i class="fa fa-cog fa-xs"></i> Account Settings</li>

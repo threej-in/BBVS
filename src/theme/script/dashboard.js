@@ -203,3 +203,52 @@ function modifyPoll(el, action,pid){
         }
     )
 }
+
+function removePoll(e){
+    pid = $(e).attr('data-pid')
+    if(pid > 0){
+        if(confirm('Are you sure you want to remove this poll?')){
+            callAjax(
+                AJAXURL,
+                {
+                    req : 'removePoll',
+                    pid : pid
+                },
+                (r)=>{
+                    r = JSON.parse(r)
+                    if(r['result']){
+                        alert(r['message'])
+                        $('button[data-pid='+pid+']').parent().parent().remove()
+                    }else{
+                        alert(e['error'])
+                    }
+                }
+            )
+        }
+    }
+}
+
+function updatePoll(e){
+    var pid = $(e).attr('data-pid');
+    var status = $(e).parent().parent().find('td select[name=status]')[0].value;
+    if(pid > 0){
+        payload = {
+            req : 'updatePoll',
+            pid : pid,
+            status: status
+        }
+        callAjax(
+            AJAXURL,
+            payload,
+            (r)=>{
+                console.log(r)
+                r = JSON.parse(r)
+                if(r['result']){
+                    alert(r['message'])
+                }else{
+                    alert(r['message'])
+                }
+            }
+        )
+    }
+}

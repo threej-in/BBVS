@@ -34,6 +34,8 @@
                         <li><a href="index.php">Home</a></li>
                         <li><a href="page/dashboard.php">Dashboard</a></li>
                         <li><a href="page/result.php">Result</a></li>
+                        <li><a href="page/dashboard.php?show=newpoll">Create Poll</a></li>
+                        <li><a href="page/dashboard.php?show=profile">Profile Settings</a></li>
                     </ul>
                 </div>
                 <div class="flexcol flexass">
