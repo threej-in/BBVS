@@ -4,7 +4,7 @@ require __DIR__.'/theme/header.php';
 $t->query('UPDATE bbvspolls set STATUS = 0 where STARTDATE + (PERIOD * 24 * 3600) < '.time());
 $t->execute();
 
-$t->query('SELECT * FROM BBVSPOLLS WHERE STATUS =1 ORDER BY STARTDATE DESC');
+$t->query('SELECT * FROM BBVSPOLLS WHERE STATUS =1 ORDER BY STARTDATE DESC LIMIT 6');
 if(false == $t->execute()){
     echo '<p class="red">Unable to fetch polls</p>';
     return;
@@ -115,7 +115,8 @@ if(false == $t->execute()){
 <h2 class="flexrow flexass" style="color: #5a5a5a;border-left: 3px solid var(--blue);padding: 5px 0 5px 10px;background-color: #0c67c10d;">Currently active Polls</h2>
 <hr style="height: 20px;">
 <div class="flexrow flexass active-polls">
-    <?php while($r = $t->fetch()){ ?>
+    <?php while($r = $t->fetch()){
+        ?>
         <div class="flexcol individual-polls" onclick="location.href='page/poll.php?title=<?php echo urlencode($r['POLLNAME'])?>'">
             <div class="flexcol flexass details">
                 <img src="contents/img/pollpic/<?php echo $r['POLLIMAGE'] ?>" alt="">
@@ -135,6 +136,7 @@ if(false == $t->execute()){
                         $total += $v;
                         $v > $winner ? $winner = $v :0;
                     }
+                    $winner == 0 ? $winner = 1:'';
                     foreach($options as $k => $v){
                         $percentage = $total > 0 ? ( $votecount[$k] / $total ) * 100 : 0;
                         echo 
@@ -143,7 +145,7 @@ if(false == $t->execute()){
                             <span>'.$percentage.'%</span>
                         </div>';
                     }
-                    echo '<hr><span class="sm"><i class="fa fa-clock"></i> Poll end date '.date('d M \a\t h:i a',$r['STARTDATE']).'</span>
+                    echo '<hr><span class="sm"><i class="fa fa-clock"></i> Poll end date '.date('d M \a\t h:i a',$r['STARTDATE'] + ($r['PERIOD'] * 86400)).'</span>
                     <button class="blue"><i class="fa fa-poll"></i> Vote</button>
                     <button class="blue" onclick="event.stopPropagation();location.href=\'page/result.php?title='.urlencode($r['POLLNAME']).'\';"><i class="fa fa-eye"></i> Result</button>';  
                 ?>
@@ -188,7 +190,7 @@ if(false == $t->execute()){
                                 <span>'.$percentage.'%</span>
                             </div>';
                         }
-                        echo '<hr><span class="sm"><i class="fa fa-clock"></i> Poll end date '.date('d M \a\t h:i a',$r['STARTDATE']).'</span>';
+                        echo '<hr><span class="sm"><i class="fa fa-clock"></i> Poll end date '.date('d M \a\t h:i a',$r['STARTDATE'] + ($r['PERIOD'] * 86400)).'</span>';
                     ?>
                 </div>
             </div>

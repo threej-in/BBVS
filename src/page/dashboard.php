@@ -103,8 +103,32 @@
         </ul>
         <hr style="height:50px;">
     </div>
+    <style>
+        tr, td{
+            border: none;
+        }
+    </style>
     <div class="content" id="contentArea">
-        
+        <h2 style="color:grey;">How to use this platform?</h2>
+        <br>
+        <table>
+            <tr>
+                <td>🗳</td>
+                <td><p>Visit homepage to see the list of active polls and click on the vote button to caste your vote.</p></td>
+            </tr>
+            <tr>
+                <td>📊</td>
+                <td><p>To create your own poll click on<strong> Create New Poll </strong>option from left sidebar.</p></td>
+            </tr>
+            <tr>
+                <td>⚙️</td>
+                <td><p>To manage your existing polls click on<strong> My Polls </strong>option from left sidebar.</p></td>
+            </tr>
+            <tr>
+                <td>👤</td>
+                <td><p>To manage your profile click on<strong> Account Settings </strong>option from left sidebar.</p></td>
+            </tr>
+        </table>        
     </div>
 </div>
 <?php

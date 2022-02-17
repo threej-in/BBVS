@@ -202,7 +202,7 @@
     </form>
     <div class="flexrow sidebar" style="width: 33%;height:1000px;overflow-y:scroll;">
         <?php
-        $t->query('SELECT * FROM BBVSPOLLS WHERE STATUS = 0 AND PID <> ? ORDER BY STARTDATE DESC LIMIT 5',[[&$poll['PID'],'i']]);
+        $t->query('SELECT * FROM BBVSPOLLS WHERE STATUS = 0 AND PERIOD > 0 AND PID <> ? ORDER BY STARTDATE DESC LIMIT 5',[[&$poll['PID'],'i']]);
         if(false != $t->execute()){
             while($poll = $t->fetch()){ 
                 echo '<div class="box" onclick="location.href=\'page/poll.php?title='.urlencode($poll['POLLNAME']).'\'">
