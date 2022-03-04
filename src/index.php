@@ -11,6 +11,18 @@ if(false == $t->execute()){
 }
                    
 ?>
+<script>
+    $(
+        ()=>{
+            bbvs.methods.pollsCount().call()
+            .then(
+                (value) => {console.log(value)},
+                (error) => {console.log(error)}
+            )
+        }
+    )
+
+</script>
 <style>
     div.banner{
         background-image: url(theme/img/blockchain.webp);

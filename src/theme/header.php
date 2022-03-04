@@ -12,6 +12,7 @@
   <script src="theme/script/brands.min.js"></script>
   <script src="theme/script/fontawesome.min.js"></script>
   <script rel="preload" as="script" src="theme/script/jquery-3.6.0.min.js"></script>
+  <script src="theme/script/web3.min.js"></script>
   <script src="theme/script/main.js"></script>
   <style>
     header span.profile{

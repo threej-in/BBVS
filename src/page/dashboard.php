@@ -114,7 +114,7 @@
         <table>
             <tr>
                 <td>🗳</td>
-                <td><p>Visit homepage to see the list of active polls and click on the vote button to caste your vote.</p></td>
+                <td><p>Visit <a href="index.php" style="color:var(--blue);">homepage</a> to see the list of active polls and click on the vote button to caste your vote.</p></td>
             </tr>
             <tr>
                 <td>📊</td>
