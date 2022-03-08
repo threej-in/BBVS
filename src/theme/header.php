@@ -1,9 +1,17 @@
 <?php
   require __DIR__.'/../class/threej.php';
   require ROOTDIR .'class/settings.php';
+  $t->query('SELECT * FROM settings',);
+  $t->execute();
+  $data = $t->fetchAll();
+  $website = [];
+  
+  foreach($data as $e => $v){$website[$v['FIELD']] = $v['VALUE'];}
+  
 ?>
 <html>
 <head>
+  <title><?= $website['title'] ?></title>
   <base href="<?php echo HOMEURI?>">
   <link rel="stylesheet" href="theme/style/brands.min.css">
   <link rel="stylesheet" href="theme/style/fontawesome.min.css">
@@ -46,7 +54,7 @@
     <div class="flexrow flexasc">
       <a href="index.php" class="flexrow" style="text-decoration: none;">
         <img class="logo brad50" src="theme/img/logo.png" alt="Blockchain Based Voting system" height="40px" width="40px">
-        <h3 style="font-weight: 800;letter-spacing: -1px;">BBVS</h3>
+        <h3 style="font-weight: 800;letter-spacing: -1px;"><?= $website['title'] ?></h3>
       </a>
     </div>
     <ul class="flexrow">

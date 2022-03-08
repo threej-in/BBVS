@@ -20,7 +20,7 @@
             <div class="flexrow flexass widget">
                 <div class="flexcol flexass">
                     <img class="logo brad50" style="box-shadow:0 0 2px 3px;" src="theme/img/logo.png" alt="Blockchain Based Voting system" height="50px" width="50px">
-                    <h3>BBVS</h3>
+                    <h3><?= $website['title'] ?></h3>
                     <p class="md">Blockchain Based Voting System is future for digital voting.</p>
                     <div class="flexrow">
                         <a target="_blank" href="https://twitter.com/threej_in"><li class="fab fa-twitter" style="color: var(--white);"></li></a>

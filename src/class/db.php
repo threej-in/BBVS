@@ -92,6 +92,7 @@ abstract class threejdb{
             return [];
         }
         $result = [];
+        
         while($data = $this->result->fetch_assoc()){
             $result[] = $data;
         }

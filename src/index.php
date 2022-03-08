@@ -9,20 +9,7 @@ if(false == $t->execute()){
     echo '<p class="red">Unable to fetch polls</p>';
     return;
 }
-                   
 ?>
-<script>
-    $(
-        ()=>{
-            bbvs.methods.pollsCount().call()
-            .then(
-                (value) => {console.log(value)},
-                (error) => {console.log(error)}
-            )
-        }
-    )
-
-</script>
 <style>
     div.banner{
         background-image: url(theme/img/blockchain.webp);
@@ -119,7 +106,7 @@ if(false == $t->execute()){
 </style>
 <div class="banner">
     <div class="intro">
-        <h1>Anonymous, Cheap, Simple & Secure Voting</h1>
+        <h1><?= $website['tagline'] ?></h1>
         <h4 class="description"><span class="blue">Blockchain Based Voting System</span> is designed to overcome all the limitations of traditional voting system.</h4>
     </div>
 </div>
