@@ -5,7 +5,7 @@ abstract class threejdb{
 
     protected
         $result,
-        $stmt; 
+        $stmt = false; 
 
     public 
         $affected_rows,
@@ -30,14 +30,23 @@ abstract class threejdb{
         return false;
     }
 
-    
+    //function for debugging
+    public function db()
+    {
+        print_r($this->con);
+        print_r($this->stmt);
+    }
     abstract function error(string $e, string $userErr, mixed $return=false);
     /**
      * @param array $values - Array of arrays of type and reference of variable, check mysqli_stmt_bind_param function for more detail
      *
      */
     function query(string $sql, array $values=[]){
-        $stmt = $this->stmt = $this->con->prepare($sql);
+        if(!empty($sql))
+            $stmt = $this->stmt = $this->con->prepare($sql);
+        else
+            $stmt = $this->stmt;
+            
         if(false !== $stmt && gettype($stmt) == 'object'){
             if(!empty($values)){
                 $type='';
@@ -55,7 +64,7 @@ abstract class threejdb{
         return false;
     }
     function prepare(string $sql, $values=[]){
-        return $this->query($sql,$values[]);
+        return $this->query($sql,$values);
     }
     function execute()
     {

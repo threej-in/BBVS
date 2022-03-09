@@ -1,10 +1,14 @@
 <?php
     $result = false;
     $message = 'internal error occured';
+
     if(isset($_POST['req'])){
         require __DIR__.'/../class/threej.php';
         require __DIR__.'/../class/settings.php';
-        // var_dump($t->strValidate('ad','!@'));die;        
+        // var_dump($t->strValidate('ad','!@'));die;
+        $isUserActive = (isset($_SESSION['status']) && $_SESSION['status'] == USERSTATUS::ACTIVE);
+        if(!$isUserActive) return print("Please verify your email address to continue");
+
         switch($_POST['req']){
             case 'deleteAccount':
                 $t->query('UPDATE `bbvsusertable` SET `NAME`=null,`USERNAME`=null,`EMAIL`=null,`PASSWORD`=null,`STATUS`=null,`ROLE`=null,`REGDATE`=null,`SECURITYQUESTION`=null,`SECURITYANSWER`=null,`IMAGE`=null WHERE username = ?',[
@@ -395,51 +399,55 @@
                     </div>
                     <hr style="height: 20px;">
                     <div class="flexrow flexass active-polls">
-                        <?php while($r = $t->fetch()){ ?>
-                            <div class="flexcol individual-polls">
-                                <div class="flexcol flexass details">
-                                    <img src="contents/img/pollpic/<?php echo $r['POLLIMAGE'] ?>" alt="">
-                                    <?php echo $r['STATUS'] ? 
-                                    '<div class="status" style="background-color: seagreen;">Active</div>' : 
-                                    '<div class="status" style="background-color: #d93939;">Not active</div>' ?>
-                                    <div class="title">
-                                        <h3><?php echo $r['POLLNAME'] ?></h3>
-                                        <p class="sm"><?php echo $r['DESCRIPTION'] ?></p>
+                        <?php
+                        if($t->affected_rows < 1){
+                            echo "<p class=\"md\">You haven't created any poll yet.</p>";
+                        }else{
+                            while($r = $t->fetch()){ ?>
+                                <div class="flexcol individual-polls">
+                                    <div class="flexcol flexass details">
+                                        <img src="contents/img/pollpic/<?php echo $r['POLLIMAGE'] ?>" alt="">
+                                        <?php echo $r['STATUS'] ? 
+                                        '<div class="status" style="background-color: seagreen;">Active</div>' : 
+                                        '<div class="status" style="background-color: #d93939;">Not active</div>' ?>
+                                        <div class="title">
+                                            <h3><?php echo $r['POLLNAME'] ?></h3>
+                                            <p class="sm"><?php echo $r['DESCRIPTION'] ?></p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="flexcol flexass options">
-                                    <p class="md" style="color:grey;">Choose your answer</p>
+                                    <div class="flexcol flexass options">
+                                        <p class="md" style="color:grey;">Choose your answer</p>
+                                        <?php
+                                            $options = json_decode($r['OPTIONS']);
+                                            foreach($options as $k => $v){
+                                                echo 
+                                                '<div class="flexrow">
+                                                    <input type="radio" name="vote" id="">
+                                                    <label class="md">'.$v.'</label>
+                                                </div>';
+                                            }
+                                        ?>
+                                    </div>
                                     <?php
-                                        $options = json_decode($r['OPTIONS']);
-                                        foreach($options as $k => $v){
-                                            echo 
-                                            '<div class="flexrow">
-                                                <input type="radio" name="vote" id="">
-                                                <label class="md">'.$v.'</label>
-                                            </div>';
-                                        }
+                                    if($r['STATUS']){
+                                        $title = urlencode($r['POLLNAME']);
+                                        echo '
+                                        <button class="blue" style="width: 92%;" onclick="location.href=\'page/poll.php?title='.$title.'\'">Cast your vote &nbsp;<i class="fa fa-external-link-alt"></i></button>
+                                        <button onclick="modifyPoll(this,\'stop\', '.$r['PID'].')" style="color:white;background-color:#cd1f1f;margin: 0 0 20px 0;width: 92%;border:1px solid red;"><i class="fa fa-ban"></i> Stop Poll</button>';
+                                    }else{
+                                        echo '<select name="votingTime" id="" style="background-color: f1f1f1;width: 92%;">
+                                            <option value="0">Select Voting period</option>
+                                            <option value="1">One Day</option>
+                                            <option value="7">One Week</option>
+                                            <option value="14">Two Weeks</option>
+                                            <option value="21">Three Weeks</option>
+                                            <option value="30">One Month</option>
+                                        </select>
+                                        <button onclick="modifyPoll(this,\'publish\', '.$r['PID'].')" class="blue" style="margin: 0 0 20px 0;width: 92%;">Publish</button>';
+                                    }
                                     ?>
                                 </div>
-                                <?php
-                                if($r['STATUS']){
-                                    $title = urlencode($r['POLLNAME']);
-                                    echo '
-                                    <button class="blue" style="width: 92%;" onclick="location.href=\'page/poll.php?title='.$title.'\'">Cast your vote &nbsp;<i class="fa fa-external-link-alt"></i></button>
-                                    <button onclick="modifyPoll(this,\'stop\', '.$r['PID'].')" style="color:white;background-color:#cd1f1f;margin: 0 0 20px 0;width: 92%;border:1px solid red;"><i class="fa fa-ban"></i> Stop Poll</button>';
-                                }else{
-                                    echo '<select name="votingTime" id="" style="background-color: f1f1f1;width: 92%;">
-                                        <option value="0">Select Voting period</option>
-                                        <option value="1">One Day</option>
-                                        <option value="7">One Week</option>
-                                        <option value="14">Two Weeks</option>
-                                        <option value="21">Three Weeks</option>
-                                        <option value="30">One Month</option>
-                                    </select>
-                                    <button onclick="modifyPoll(this,\'publish\', '.$r['PID'].')" class="blue" style="margin: 0 0 20px 0;width: 92%;">Publish</button>';
-                                }
-                                ?>
-                            </div>
-                        <?php } ?>
+                        <?php }} ?>
                     </div>
                 </div>
                 <hr style="height: 20px;">
@@ -538,39 +546,43 @@
                     </div>
                     <hr style="height: 20px;">
                     <div class="flexrow active-polls">
-                    <?php while($r = $t->fetch()){ ?>
-                        <div class="flexcol individual-polls" onclick="location.href='page/result.php?title=<?php echo urlencode($r['POLLNAME'])?>'">
-                            <div class="flexcol flexass details">
-                                <img src="contents/img/pollpic/<?php echo $r['POLLIMAGE'] ?>" alt="">
-                                <div class="title">
-                                    <h3><?php echo $r['POLLNAME'] ?></h3>
-                                    <p class="sm"><?php echo $r['DESCRIPTION'] ?></p>
+                    <?php
+                    if($t->affected_rows < 1){
+                        echo "<p class=\"md\">You haven't participated in any poll yet.</p>";
+                    }else{
+                        while($r = $t->fetch()){ ?>
+                            <div class="flexcol individual-polls" onclick="location.href='page/result.php?title=<?php echo urlencode($r['POLLNAME'])?>'">
+                                <div class="flexcol flexass details">
+                                    <img src="contents/img/pollpic/<?php echo $r['POLLIMAGE'] ?>" alt="">
+                                    <div class="title">
+                                        <h3><?php echo $r['POLLNAME'] ?></h3>
+                                        <p class="sm"><?php echo $r['DESCRIPTION'] ?></p>
+                                    </div>
+                                </div>
+                                <div class="flexcol flexass options" style="row-gap: 0.1em;">
+                                    <!-- <p class="md" style="color:grey;">Options</p> -->
+                                    <?php
+                                        $options = json_decode($r['OPTIONS']);
+                                        $votecount = json_decode($r['VOTECOUNT']);
+                                        $total=0;
+                                        $winner=-1;
+                                        foreach($votecount as $k => $v){
+                                            $total += $v;
+                                            $v > $winner ? $winner = $v :0;
+                                        }
+                                        foreach($options as $k => $v){
+                                            $percentage = $total > 0 ? ( $votecount[$k] / $total ) * 100 : 0;
+                                            echo 
+                                            '<div class="flexrow option">
+                                                <label class="'.($votecount[$k] == $winner ? 'wn-option': 'gn-option').' md" style="width:'.$percentage.'%;">'.$v.'</label>
+                                                <span>'.$percentage.'%</span>
+                                            </div>';
+                                        }
+                                        echo '<hr><span class="sm"><i class="fa fa-clock"></i> Poll end date '.date('d M \a\t h:i a',$r['STARTDATE']).'</span>';
+                                    ?>
                                 </div>
                             </div>
-                            <div class="flexcol flexass options" style="row-gap: 0.1em;">
-                                <!-- <p class="md" style="color:grey;">Options</p> -->
-                                <?php
-                                    $options = json_decode($r['OPTIONS']);
-                                    $votecount = json_decode($r['VOTECOUNT']);
-                                    $total=0;
-                                    $winner=-1;
-                                    foreach($votecount as $k => $v){
-                                        $total += $v;
-                                        $v > $winner ? $winner = $v :0;
-                                    }
-                                    foreach($options as $k => $v){
-                                        $percentage = $total > 0 ? ( $votecount[$k] / $total ) * 100 : 0;
-                                        echo 
-                                        '<div class="flexrow option">
-                                            <label class="'.($votecount[$k] == $winner ? 'wn-option': 'gn-option').' md" style="width:'.$percentage.'%;">'.$v.'</label>
-                                            <span>'.$percentage.'%</span>
-                                        </div>';
-                                    }
-                                    echo '<hr><span class="sm"><i class="fa fa-clock"></i> Poll end date '.date('d M \a\t h:i a',$r['STARTDATE']).'</span>';
-                                ?>
-                            </div>
-                        </div>
-                    <?php } ?>
+                    <?php }} ?>
                     </div>
                 </div>
                 <hr style="height: 20px;">

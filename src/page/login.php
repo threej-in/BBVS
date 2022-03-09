@@ -93,10 +93,7 @@
     }
 
     if($error == '' && isset($_POST['login'])){
-        //email validation
-        $t->strValidate($_POST['loginid'],'email') ? 
-            $loginid = $_POST['loginid'] :
-            $error = 'Username or Email is required!';
+        $loginid = $_POST['loginid'] ?? '';
 
         //password validation
         isset($_POST['password']) && empty($_POST['password']) ? 
@@ -115,9 +112,9 @@
                 [&$loginid,'s']
             ];
             if($t->strValidate($loginid, 'email')){
-                $result = $t->query('SELECT UID,USERNAME,PASSWORD,ROLE from BBVSUSERTABLE WHERE EMAIL = ?', $values);
+                $result = $t->query('SELECT UID,USERNAME,PASSWORD,STATUS,ROLE from BBVSUSERTABLE WHERE EMAIL = ?', $values);
             }else{
-                $result = $t->query('SELECT UID,USERNAME,PASSWORD,ROLE from BBVSUSERTABLE WHERE USERNAME = ?', $values);
+                $result = $t->query('SELECT UID,USERNAME,PASSWORD,STATUS,ROLE from BBVSUSERTABLE WHERE USERNAME = ?', $values);
             }
             if(false !== $result){
                 $t->execute();
@@ -127,6 +124,7 @@
                         $_SESSION['UID'] = $result['UID'];
                         $_SESSION['username'] = $result['USERNAME'];
                         $_SESSION['role'] = $result['ROLE'];
+                        $_SESSION['status'] = $result['STATUS'];
                         header('Location: dashboard.php');
                     }
                 }
@@ -299,6 +297,7 @@
                 <form action="page/login.php" method="POST" id="login">
                     <div>
                         <h2>Log In</h2>
+                        <p class="md">or <a href="page/register.php" class="bluetext" style="margin:0px;">Sign Up</a> for a new account</p>
                     </div>
                     <section>
                         <label for="loginid">Enter username or email.</label>

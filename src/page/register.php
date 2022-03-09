@@ -4,6 +4,33 @@
         header('Location: dashboard.php');        
     }
     $error = '';
+    if(isset($_GET['req']) && $_GET['req'] == 'verify-email'){
+        $error = "Email verification token expired!";
+        $email = $_GET['email'] ?? '';
+        try {
+            //get user data from email
+            $t->prepare('SELECT PASSWORD, REGDATE FROM BBVSUSERTABLE WHERE EMAIL LIKE ?',[[&$email,'s']]);
+            $t->execute();
+            $data = $t->fetch();
+
+            //verify token
+            if(isset($_GET['token']) && $_GET['token'] == hash('sha256',$t->addSalt($email . $data['PASSWORD'] . $data['REGDATE']))){
+                
+                //update status
+                $t->query('UPDATE BBVSUSERTABLE SET STATUS = ? WHERE EMAIL LIKE ?',[
+                    [USERSTATUS::ACTIVE, 'i'],
+                    [$email,'s']
+                ]);
+                if($t->execute()){
+                    echo "Email verified successfully. Click here to <a class=\"bluetext\" href=\"page/login.php\">login.</a>";
+                    return;
+                }
+            }
+            echo "Internal error occured";
+        } catch (Exception $err) {
+            echo "Internal error occured";
+        }
+    }
     if(isset($_POST['register'])){
         $name = $_POST['name'] ?? '';
         isset($_POST['username']) && empty($_POST['username']) ? 
@@ -21,8 +48,8 @@
         isset($_POST['securityAnswer']) && empty($_POST['securityAnswer']) ? 
         $error ='Please provide answer to your security question.': $answer = $_POST['securityAnswer'];
         //verify captcha
-        isset($_POST['captcha']) && empty($_POST['captcha']) ? 
-        $error = 'Invalid captcha!': ($t->validateCaptcha($_POST['captcha']) ? :$error = 'Invalid captcha!');
+        // isset($_POST['captcha']) && empty($_POST['captcha']) ? 
+        // $error = 'Invalid captcha!': ($t->validateCaptcha($_POST['captcha']) ? :$error = 'Invalid captcha!');
 
         if($error == ''){
             $t->strValidate($username,'!@') ? : $error = 'Special characters are not allowed in username';
@@ -51,14 +78,47 @@
                     [&$username,'s'],
                     [&$email,'s'],
                     [&$hashed_password,'s'],
+                    [USERSTATUS::ONHOLD,'i'],
                     [&$time,'i'],
                     [&$question,'i'],
                     [&$hashed_answer,'s']
                 ];
-                $result = $t->query('INSERT INTO BBVSUSERTABLE(NAME, USERNAME, EMAIL, PASSWORD, REGDATE, SECURITYQUESTION, SECURITYANSWER) VALUES(?,?,?,?,?,?,?)', $values);
+                $result = $t->query('INSERT INTO BBVSUSERTABLE(NAME, USERNAME, EMAIL, PASSWORD, STATUS, REGDATE, SECURITYQUESTION, SECURITYANSWER) VALUES(?,?,?,?,?,?,?,?)', $values);
+                // $t->db();
                 if(false !== $result){
                     $result = $t->execute();
+                    
                     if($t->affected_rows == 1){
+                        $token = hash('sha256',$t->addSalt($email . $hashed_password . $time));
+                        $link = HOMEURI . "page/register.php?req=verify-email&email=$email&token=$token";
+                        $body = "
+                            <h2>Hello $name, and welcome to BBVS. We are glad to have you in our ecosystem 😊</h2>
+                            <br>
+                            To get started we need you to verify your email and avail all the benefits provided by us for free.
+                            <br><br>
+                            <a href=\"$link\" style=\"margin:auto;\">
+                                <button style=\"
+                                background-color: royalblue;
+                                color: white;
+                                border: none;
+                                padding: 10px 75px;
+                                margin: auto;
+                                border-radius: 4px;
+                                display: block;
+                                width: 50%;
+                                cursor:pointer;\"> Verify email address</button>
+                            </a>
+                            <br><br>
+                            or copy paste the below link to web browser
+                            <br>
+                            $link
+                            <br><br>
+                            If you do not remember signing up for this account then simply ignore this email.
+                            <br><br>
+                            <hr>
+                            &copy; ".date('Y', time())." BBVS
+                        ";
+                        $t->sendmail($email,'Welcome to BBVS', $body);
                         $_SESSION['username'] = $username;
                         header('Location: dashboard.php');
                     }
@@ -68,6 +128,7 @@
             }
         }
     }
+    if(!isset($_GET['req'])){
 ?>     
 <script>
     function isEmpty(element){
@@ -232,5 +293,6 @@
     </form>
 </div>
 <?php
+    }
     require ROOTDIR.'theme/footer.php';
 ?>
