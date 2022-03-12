@@ -171,10 +171,10 @@ class threej extends threejdb{
         try {
             // $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
             $mail->isSMTP();                                            //Send using SMTP
-            $mail->Host       = 'threej.in';                     //Set the SMTP server to send through
+            $mail->Host       = $GLOBALS['MAILHOST'];                     //Set the SMTP server to send through
             $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-            $mail->Username   = 'noreply@threej.in';                     //SMTP username
-            $mail->Password   = 'palji10dra@123';                               //SMTP password
+            $mail->Username   = $GLOBALS['MAILUSERNAME'];                     //SMTP username
+            $mail->Password   = $GLOBALS['MAILPASSWORD'];                               //SMTP password
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
             $mail->Port       = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
 

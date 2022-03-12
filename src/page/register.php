@@ -1,9 +1,48 @@
 <?php
     require __DIR__.'/../theme/header.php';
-    if(isset($_SESSION['username'])){
-        header('Location: dashboard.php');        
+    function sendVerificationEmail($email, $name, $link){
+        $body = "
+            <h2>Hello $name, and welcome to BBVS. We are glad to have you in our ecosystem 😊</h2>
+            <br>
+            To get started we need you to verify your email and avail all the benefits provided by us for free.
+            <br><br>
+            <a href=\"$link\" style=\"margin:auto;\">
+                <button style=\"
+                background-color: royalblue;
+                color: white;
+                border: none;
+                padding: 10px 75px;
+                margin: auto;
+                border-radius: 4px;
+                display: block;
+                width: 50%;
+                cursor:pointer;\"> Verify email address</button>
+            </a>
+            <br><br>
+            or copy paste the below link to web browser
+            <br>
+            $link
+            <br><br>
+            If you do not remember signing up for this account then simply ignore this email.
+            <br><br>
+            <hr>
+            &copy; ".date('Y', time())." BBVS
+        ";
+        $GLOBALS['t']->sendmail($email,'Welcome to BBVS', $body);
     }
     $error = '';
+    if(isset($_GET['req']) && $_GET['req'] == 'new-verification-email'){
+        if(false != $t->query('SELECT NAME, EMAIL, PASSWORD, REGDATE FROM BBVSUSERTABLE WHERE UID = ' . $_SESSION['UID'])){
+            $t->execute();
+            $user = $t->fetch();
+            $token = hash('sha256',$t->addSalt($user['EMAIL'] . $user['PASSWORD'] . $user['REGDATE']));
+            $link = HOMEURI . "page/register.php?req=verify-email&email={$user['EMAIL']}&token=$token";
+            sendVerificationEmail($user['EMAIL'], $user['NAME'],$link);
+            echo 'Verification email sent successfully';
+            return;
+        }        
+    }
+
     if(isset($_GET['req']) && $_GET['req'] == 'verify-email'){
         $error = "Email verification token expired!";
         $email = $_GET['email'] ?? '';
@@ -31,6 +70,11 @@
             echo "Internal error occured";
         }
     }
+
+    if(isset($_SESSION['username'])){
+        header('Location: dashboard.php');        
+    }
+    
     if(isset($_POST['register'])){
         $name = $_POST['name'] ?? '';
         isset($_POST['username']) && empty($_POST['username']) ? 

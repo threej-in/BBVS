@@ -7,7 +7,7 @@
         require __DIR__.'/../class/settings.php';
         // var_dump($t->strValidate('ad','!@'));die;
         $isUserActive = (isset($_SESSION['status']) && $_SESSION['status'] == USERSTATUS::ACTIVE);
-        if(!$isUserActive) return print("Please verify your email address to continue");
+        if(!$isUserActive) return print("Please verify your email address to continue. <br>Didn't got your verification email? <a style=\"color:var(--pl);\" href=\"page/register.php?req=new-verification-email\">Click here to request a new email.</a>");
 
         switch($_POST['req']){
             case 'deleteAccount':
@@ -144,6 +144,21 @@
                 </div>
                 <?php
                 return;
+            break;
+            case 'newComment':
+                !isset($_SESSION['username']) ? die('LogIn to post comment'):'';
+                if(isset($_POST['comment'])){
+                    $t->query('INSERT INTO COMMENTS(COMMENT, PID, CDATE, UID) VALUES(?,?,?,?)',[
+                        [&$_POST['comment'],'s'],
+                        [&$_POST['pid'],'i'],
+                        [time(),'i'],
+                        [&$_SESSION['UID'],'i']
+                    ]);
+                    if(false!== $t->execute()){
+                        $result = true;
+                        $message = 'Comment added';
+                    }
+                }
             break;
             case 'pollManagement':
                 if($_SESSION['role'] !== USERROLE::ADMIN && $_SESSION['role'] !== USERROLE::MODERATOR) return;

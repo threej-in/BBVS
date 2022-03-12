@@ -66,6 +66,7 @@
         header('Location: ../index.php');
     }
     if($poll['STATUS'] === 0) header('Location: result.php?title='.$_GET['title']);
+    $pid = $poll['PID'];
 ?>
 <style>
     input{cursor: pointer;}
@@ -192,6 +193,25 @@
             });
         }
     });
+    function postComment(el){
+        fd = new FormData($('#newCommentForm')[0]);
+        fd.append('req','newComment');
+        fd.append('pid',<?= $pid ?>);
+        callAjax(
+            'ajax/user.php',
+            fd,
+            (data)=>{
+                data = JSON.parse(data);
+                if(data['result']){
+                    location.reload();
+                }
+            },
+            (err)=>{
+                console.log(err);
+                alert('Unknown error occured');
+            }
+        );
+    }
 </script>
 <div class="flexrow">
     <p style="font-weight:700;color: grey;width:65%;margin:20px 0;font-size:22px;padding-left:40px;">Caste your vote for <?php echo $poll['POLLNAME'] ?></p>
@@ -247,7 +267,32 @@
         }
         ?>
     </div>
+    <div style="padding: 35px;background-color: #ecebeb;width: 59%;margin: 35px;">
+        <p class="md">comment as <?= $_SESSION['username'] ?></p>
+        <form action="#" method="post" id="newCommentForm">
+            <textarea style="padding:5px;" name="comment" id="" cols="60" rows="2"></textarea>
+            <button style="width:fit-content;" class="blue" type="button" onclick="postComment(this)">comment</button>
+        </form>
+        <hr>
+        <div class="flexcol flexass">
+        <?php
+            if(false != $t->query('SELECT c.*, b.USERNAME, b.IMAGE FROM COMMENTS as c, BBVSUSERTABLE as b WHERE b.UID = c.UID and PID = ? ORDER BY CDATE DESC LIMIT 50',[[&$pid,'i']])){
+                $t->execute();
+                while($comment = $t->fetch()){
+                    echo '
+                    <div class="flexcol flexass">
+                        <p class="quote" style="margin-bottom:0px;color:var(--black);">'.$comment['COMMENT'].'</p>
+                        <p class="md flexrow flexasc" style="color:var(--grey);margin-left:10px;"><img class="brad50" width="30px" height="30px" src="contents/img/profilepic/'.$comment['IMAGE'].'">'.$comment['USERNAME'].' . '.date('d M Y',$comment['CDATE']).'</p>
+                    </div>
+                    <hr>';
+                }
+            }
+            
+        ?>
+        </div>
+    </div>
 </div>
+
 <?php
 
 include ROOTDIR .'theme/footer.php';

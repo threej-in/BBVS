@@ -196,3 +196,8 @@ label{
 .hide{
     display: none;
 }
+.quote{
+    border-left: 3px solid var(--lblue);
+    padding: 5px;
+    margin: 5px 5px 0 0;
+}
