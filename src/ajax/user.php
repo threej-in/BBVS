@@ -127,7 +127,7 @@
                             <p id="description_err" class="red sm" style="display: none;">Description is required</p>
                         </section>
                         <section>
-                            <img src="" alt="" data-id="pollpic" style="display: none;">
+                            <img src="" alt="" data-id="pollpic" style="display: none;" width="500px">
                             <label for="">Upload an image for your poll</label>
                             <input type="file" onchange="return validateImage(this,false,'pollpic', 500)" accept=".jpg,.png,.jpeg" name="pollImage" required>
                         </section>
@@ -139,7 +139,7 @@
                             <p id="email_err" class="red sm"></p>
                         </section>
                         <p class="red md"><?php echo $error ?? '' ?></p>
-                        <button name="register" type="button" class="blue" onclick="submitNewPoll()">Create Poll</button>
+                        <button name="register" type="button" class="blue" onclick="submitNewPoll(this)">Create Poll</button>
                     </form>
                 </div>
                 <?php

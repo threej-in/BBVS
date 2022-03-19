@@ -10,7 +10,10 @@ contract BBVS is inheritingBase{
         Inactive,
         Active
     }
-    
+    struct voter{
+        bytes32 optionChosed;
+    }
+
     struct poll {
         string title;
         address createdBy;
@@ -19,13 +22,7 @@ contract BBVS is inheritingBase{
         Status status;
         uint64 time;
         uint16 periodInDays;
-    }
-
-    struct voting{
-        address voter;
-        uint pollId;
-        uint8 option;
-        uint userUniqueId;
+        mapping(bytes32 => voter) voters;
     }
 
     mapping(uint => poll) public polls;
@@ -58,7 +55,7 @@ contract BBVS is inheritingBase{
         newpoll.time = uint64(block.timestamp); //write
         newpoll.periodInDays = uint16(0); //write
         pollsCount = count; //write
-        return (count);
+        return count;
     }
 
     /*
@@ -84,11 +81,32 @@ contract BBVS is inheritingBase{
         return true;
     }
 
-    function endPoll(uint _pid) public validatePollId(_pid) validateAuthor(_pid) returns(bool){
+    function endPoll(uint _pid) public validatePollId(_pid) validateAuthor(_pid) isPollActive(_pid) returns(bool){
         polls[_pid].status = Status.Inactive;
         return true;
     }
 
+    function vote(uint _pid, string memory _email, uint _option, string memory _secretPhrase) public validatePollId(_pid) isPollActive(_pid) returns (
+        bool
+    ){
+        bytes32 hashedOption = keccak256(abi.encodePacked(_option, _secretPhrase));
+        bytes32 hashedEmail = keccak256(abi.encodePacked(_email));
+
+        require(polls[_pid].voters[hashedEmail].optionChosed == '',"You have already casted your vote for this poll!");
+
+        //increment votecounter
+        polls[_pid].voteCount[_option]++;
+
+        voter memory newVote;
+        newVote.optionChosed = hashedOption;
+        polls[_pid].voters[hashedEmail] = newVote;
+        return true;
+    }
+
+    modifier isPollActive(uint _pid) {
+        require(polls[_pid].status == Status.Active,"Poll is not yet started");
+        _;
+    }
     modifier validatePollId(uint _pid) {
         require(_pid > 0 && _pid <= pollsCount, "Id is invalid, poll not found");
         _;

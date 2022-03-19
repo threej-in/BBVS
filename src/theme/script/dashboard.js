@@ -160,21 +160,46 @@ function deleteAccount(e){
         )
     }
 }
-
-function submitNewPoll(){
+treceipt={}
+async function submitNewPoll(e){
     fd = new FormData($('#newPoll')[0]);
-    fd.append('req','createNewPoll');
-    callAjax(
-        AJAXURL,
-        fd,
-        (result)=>{
-            r = JSON.parse(result);
-            alert(r['message'])
-            if(r['result']){
-                $('#mypolls').click()
+        fd.append('req','createNewPoll');
+        fd.append('txhash',receipt.transactionHash)
+        callAjax(
+            AJAXURL,
+            fd,
+            (result)=>{
+                r = JSON.parse(result);
+                alert(r['message'])
+                if(r['result']){
+                    $('#mypolls').click()
+                }else{
+                    console.log('error occured');
+                }
             }
+        )
+    $(e).attr('disabled','disabled');
+    $(e).text('Writing your poll data to blockchain');
+    if(typeof window.ethereum != 'undefined' && ethereum.isMetaMask){
+        userAccounts = await ethereum.request({method:'eth_requestAccounts'});
+
+        if(typeof bbvs != 'undefined'){
+            data = bbvs.methods.newPoll('new poll',['1','1']).send({
+                from: ethereum.selectedAddress
+            }).then((receipt)=>{
+                treceipt = receipt;
+                console.log(receipt);
+            }).catch((err)=>{
+                console.log(err);
+                alert('internal error occured!');
+            })
+        }else{
+            alert('Unable to establish connection with blockchain');
         }
-    )
+        return;
+    }else{
+        alert('Install metamask extension to continue');
+    }
 }
 
 function modifyPoll(el, action,pid){

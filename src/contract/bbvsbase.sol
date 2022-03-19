@@ -25,12 +25,9 @@ contract inheritingBase {
     }
 
     function stopContract(address _newAddress) public onlyOwner isActive returns(bool){
+        require(newContractAddress != _newAddress, "New contract address should not be same as existing contract!");
         contractStatus = false;
-
-        if(newContractAddress == _newAddress) return false;
-
         newContractAddress = _newAddress;
-
         payable(owner).transfer(address(this).balance);
         return true;
     }
