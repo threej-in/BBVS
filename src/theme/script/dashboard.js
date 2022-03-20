@@ -163,21 +163,22 @@ function deleteAccount(e){
 treceipt={}
 async function submitNewPoll(e){
     fd = new FormData($('#newPoll')[0]);
-        fd.append('req','createNewPoll');
-        fd.append('txhash',receipt.transactionHash)
-        callAjax(
-            AJAXURL,
-            fd,
-            (result)=>{
-                r = JSON.parse(result);
-                alert(r['message'])
-                if(r['result']){
-                    $('#mypolls').click()
-                }else{
-                    console.log('error occured');
-                }
+    fd.append('req','createNewPoll');
+    fd.append('txhash',receipt.transactionHash)
+    callAjax(
+        AJAXURL,
+        fd,
+        (result)=>{
+            r = JSON.parse(result);
+            alert(r['message'])
+            if(r['result']){
+                $('#mypolls').click()
+            }else{
+                console.log('error occured');
             }
-        )
+        }
+    )
+    
     $(e).attr('disabled','disabled');
     $(e).text('Writing your poll data to blockchain');
     if(typeof window.ethereum != 'undefined' && ethereum.isMetaMask){
