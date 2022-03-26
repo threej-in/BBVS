@@ -22,9 +22,9 @@
     $DBPASS = '';
 
     //mail
-    $MAILHOST = "threej.in";
-    $MAILUSERNAME = "noreply@threej.in";
-    $MAILPASSWORD = "palji10dra@123";
+    $MAILHOST = "";
+    $MAILUSERNAME = "";
+    $MAILPASSWORD = "";
 
     //salt
     $SALT = 'fqubf3bf9021fcaocer13rf3298bf4nfw498nf34';
