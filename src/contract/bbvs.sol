@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.8.0;
-//geth --http --http.corsdomain="package://6fd22d6fe5549ad4c4d8fd3ca0b7816b.mod" --http.api web3,eth,debug,personal,net --vmdebug --datadir /tmp/eth/60 --allow-insecure-unlock --dev console
+//geth --http --http.corsdomain="package://6fd22d6fe5549ad4c4d8fd3ca0b7816b.mod",* --http.api web3,eth,debug,personal,net --vmdebug --datadir /tmp/eth/60 --allow-insecure-unlock --dev console
 //["BJP","AAP","NOTA"]
 // import "hardhat/console.sol";
 import "./bbvsbase.sol";
@@ -105,6 +105,11 @@ contract BBVS is inheritingBase{
 
     modifier isPollActive(uint _pid) {
         require(polls[_pid].status == Status.Active,"Poll is not yet started");
+        uint expdate = (polls[_pid].periodInDays * 86400) + polls[_pid].time;
+        if(block.timestamp > expdate){
+            polls[_pid].status = Status.Inactive;
+            revert("Poll has been expired!");
+        }
         _;
     }
     modifier validatePollId(uint _pid) {

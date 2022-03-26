@@ -5,16 +5,48 @@ $(()=>{
     }) : 0;
 })
 
-//not allow  user to enter the special charecters only '@' '.' are allow// 
-$('#loginid').on('keypress', function (event) {
-    var regex = new RegExp("^[a-zA-Z0-9@.]+$");
-    var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
-    if (!regex.test(key)) {
-        event.preventDefault();
-         $('#id_err').text('special char not allowed');
-        return false;
+/**
+ * 
+ * @param {string} url 
+ * @param {Object|FormData} data 
+ * @param {callback} success 
+ * @param {callback} error 
+ * @returns 
+ */
+function callAjax(url, data, success, error = {}){
+    if(!(data instanceof FormData)){
+        if(!(data instanceof Object)) return false;
+
+        fd = new FormData
+        for (key in data) { fd.append(key, data[key]) }
+        data = fd
     }
-});
+    $.ajax({
+        url : url,
+        type : 'post',
+        data : data,
+        contentType: false,
+        processData: false,
+        cache: false,
+        timeout: 800000,
+        success : success,
+        error : error
+    })
+}
+/**
+ * @returns boolean
+ */
+function emptyOrNull(el){
+	return el.trim() == '' || el == NULL ? true : false;
+}
+/**
+ * 
+ * @param {any} element 
+ * @returns boolean
+ */
+function isset(element){
+    return (typeof(element) != 'undefined') ? true : false;
+}
 /**
  * 
  * @param {string} option Send options as specified below
@@ -66,6 +98,20 @@ function validateString(str, option){
     }
     return false;
 }
+
+//Functions related to current website
+
+//not allow  user to enter the special charecters only '@' '.' are allow// 
+$('#loginid').on('keypress', function (event) {
+    var regex = new RegExp("^[a-zA-Z0-9@.]+$");
+    var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+    if (!regex.test(key)) {
+        event.preventDefault();
+         $('#id_err').text('special char not allowed');
+        return false;
+    }
+});
+
 function isEmpty(element){
     if($('#'+element).val().trim() == ''){
         $('#'+element+'_err').show()
@@ -75,44 +121,9 @@ function isEmpty(element){
     $('#'+element+'_err').hide()
     return false
 }
-/**
- * 
- * @param {string} url 
- * @param {Object|FormData} data 
- * @param {callback} success 
- * @param {callback} error 
- * @returns 
- */
-function callAjax(url, data, success, error = {}){
-    if(!(data instanceof FormData)){
-        if(!(data instanceof Object)) return false;
 
-        fd = new FormData
-        for (key in data) { fd.append(key, data[key]) }
-        data = fd
-    }
-    $.ajax({
-        url : url,
-        type : 'post',
-        data : data,
-        contentType: false,
-        processData: false,
-        cache: false,
-        timeout: 800000,
-        success : success,
-        error : error
-    })
-}
-/**
- * 
- * @param {any} element 
- * @returns boolean
- */
-function isset(element){
-    return (typeof(element) != 'undefined') ? true : false;
-}
 web3 = {}
-$( () => {
+$( async () => {
     
     if(isset(Web3)){
 		try {
@@ -345,12 +356,38 @@ $( () => {
 					"type": "receive"
 				}
 			];
-			const contractAddress = "0x11040FE530CC43c532d3F63B06E20eb639010E84";
+			const contractAddress = "0xeD25aDDa1Df09BD548C198c30c6460342aC88c6F";
 			const from = "0xFC43025223C4305db566f11c0b661AA4bAe1A668";
+			
 			web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
-			bbvs = new web3.eth.Contract(abi, contractAddress);	
+			// web3.eth.handleRevert = true
+			bbvs = new web3.eth.Contract(abi, contractAddress);
+			
+			
 		} catch (error) {
 			console.log(error);
 		}
     }
 })
+
+/**
+ * Checks if metamask is installed and connected to local ethereum test network
+ * 
+ * @returns boolean
+ */
+async function web3Connection(){
+	const targetNetworkId = '0x539';
+	if(typeof window.ethereum != 'undefined' && ethereum.isMetaMask){
+		if (ethereum.chainId != targetNetworkId) {
+			await ethereum.request({
+				method: 'wallet_switchEthereumChain',
+    			params: [{ chainId: targetNetworkId }],
+			})
+		}
+		return true;
+	}else{
+		alert('Install metamask extension to continue');
+		return false;
+	}
+
+}

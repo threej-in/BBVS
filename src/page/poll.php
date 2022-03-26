@@ -1,16 +1,16 @@
 <?php
 
     require __DIR__.'/../theme/header.php';
-    $t->query('SELECT PID,OPTIONS FROM BBVSPOLLS ');
 
-    if(!isset($_SESSION['username'])) header('Location: login.php');
+    if(!isset($_SESSION['username'])){header('Location: login.php');return;};
     $error = '';
     if(isset($_POST['pollid']) && isset($_SESSION['UID'])){
         if(isset($_POST['vote']) && !empty($_POST['vote'])){
             if(isset($_POST['securityAnswer']) && !empty($_POST['securityAnswer'])){
-                $t->query('SELECT SECURITYANSWER FROM BBVSUSERTABLE WHERE UID = ?',[[&$_SESSION["UID"],'i']]);
+                $t->query('SELECT SECURITYANSWER, EMAIL FROM BBVSUSERTABLE WHERE UID = ?',[[&$_SESSION["UID"],'i']]);
                 if(false != $t->execute()){
-                    if(password_verify($_POST['securityAnswer'],$t->fetch()['SECURITYANSWER'])){
+                    $user = $t->fetch();
+                    if(password_verify($_POST['securityAnswer'],$user['SECURITYANSWER'])){
                         if(password_verify($t->addSalt($_POST['pollid']), $_POST['signature'])){
                             $votehash = hash('sha256',$_POST['securityAnswer'] . $_POST['vote']);
                             $t->query('INSERT INTO BBVSVOTES SET UID = ?, PID = ?, VOTEHASH = ?',[
@@ -19,7 +19,7 @@
                                 [&$votehash,'s']
                             ]);
                             if(false!=$t->execute()){
-                                $t->query('SELECT PID, VOTECOUNT FROM BBVSPOLLS WHERE PID = ?',[[&$_POST['pollid'],'i']]);
+                                $t->query('SELECT PID, VOTECOUNT,BPID FROM BBVSPOLLS WHERE PID = ?',[[&$_POST['pollid'],'i']]);
                                 if(false != $t->execute()){
                                     $data = $t->fetch();
                                     $arr = json_decode($data['VOTECOUNT']);
@@ -29,9 +29,62 @@
                                         [&$json,'s'],
                                         [&$data['PID'],'i']
                                     ]);
-                                    if(false!= $t->execute() && $t->affected_rows == 1){
-                                        header('Location: result.php?vote=success&title='.$_POST['pollname']);
-                                        return;
+
+                                    if(false!= $t->execute() && $t->affected_rows == 1){ ?>
+                                        <script>
+                                            $(()=>{
+                                                
+                                                web3Connection().then(()=>{
+                                                    bbvs.methods.vote(
+                                                        <?= $data['BPID'] ?>,
+                                                        '<?= $user['EMAIL'] ?>',
+                                                        <?= $_POST['vote'] -1 ?>,
+                                                        '<?= $_POST['securityAnswer'] ?>'
+                                                    )
+                                                    .send({from: ethereum.selectedAddress})
+                                                    .then((receipt)=>{
+                                                        $('#popup_img').attr('src','theme/img/greencheck.jpg')
+                                                        $('#popup_message').text("You have successfully casted your vote.");
+                                                        $('#popup_btn').show();
+                                                    })
+                                                    .catch(err=>{
+                                                        alert('Transaction Failed or reverted!');
+                                                        console.log(err);
+                                                    })
+                                                })
+                                            })
+                                        </script>
+                                        <?php
+                                        echo "<style>
+                                            .popup-parent{
+                                                position: fixed;
+                                                background-color: #2a2a2abd;
+                                                top: 0;
+                                                left: 0;
+                                                width: 100vw;
+                                                height: 100vw;
+                                                z-index: 1000;
+                                                padding-top: 150px;
+                                                border-radius: 5px;
+                                            }
+                                            .popup{
+                                                position: absolute;
+                                                background-color: white;
+                                                width: 50%;
+                                                padding: 50px;
+                                                border-radius: 10px;
+                                                box-shadow: 0 0 80px 10px grey;
+                                                left: 25%;
+                                            }
+                                        </style>
+                                        <div class=\"popup-parent\">
+                                            <div class=\"flexcol popup\">
+                                                <img id=\"popup_img\" src=\"theme/img/loading.gif\" width=\"250px\"><br>
+                                                <h3 id=\"popup_message\">Sign the transaction to confirm your vote.</h3>
+                                                <a href=\"page/result.php?title={$_POST['pollname']}\" id=\"popup_btn\" style=\"display:none;\"><button>Confirm</button></a>
+                                            </div>
+                                        </div>";
+                                        
                                     }else{
                                         $error = 'Internal error occured';
                                     }
@@ -56,7 +109,7 @@
         }
         
     }
-    if(!isset($_GET['title'])) header('Location: ../index.php');
+    if(!isset($_GET['title'])){header('Location: ../index.php');return;}
 
     $title = urldecode($_GET['title']);
     $t->query('SELECT a.*, b.SECURITYQUESTION FROM BBVSPOLLS AS a, BBVSUSERTABLE AS b WHERE a.POLLNAME LIKE ? AND b.UID = ? LIMIT 1', [[&$title,'s'],[&$_SESSION['UID'],'i']]);
@@ -244,7 +297,8 @@
                     }
                     echo '</div>
                     <div style="padding:0 30px;" class="flexcol flexass">
-                        <hr><span class="md">Q. '.SETTINGS::securityQuestion[$poll['SECURITYQUESTION']].'</span>
+                        <hr><p class="md" style="color:grey;">Answer your security question</p>
+                        <span class="md">Q. '.SETTINGS::securityQuestion[$poll['SECURITYQUESTION']].'</span>
                         <input type="text" name="securityAnswer" placeholder="Enter answer to your security question" required></input>
                         <span class="red md">'.$error.'</span>
                         <span class="sm"><i class="fa fa-clock"></i> Poll end date '.date('d M \a\t h:i a',$poll['STARTDATE'] + ($poll['PERIOD'])*24*3600).'</span>
@@ -254,7 +308,9 @@
             <button type="submit" id='btn_submit' style="background-color:var(--blue);color:#fff;font-weight:bold">Submit</button>
         </div>  
     </form>
-    <div class="sidebar flexrow" style="width: 33%;height:1000px;overflow-y:scroll;">
+
+    <!-- Active polls in sidebar -->
+    <div class="sidebar flexrow flexass" style="width: 33%;height:1000px;overflow-y:scroll;">
         <?php
         $t->query('SELECT * FROM BBVSPOLLS WHERE STATUS = 1 AND PID <> ? ORDER BY STARTDATE DESC LIMIT 5',[[&$poll['PID'],'i']]);
         if(false != $t->execute()){

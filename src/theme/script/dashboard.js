@@ -160,77 +160,141 @@ function deleteAccount(e){
         )
     }
 }
-treceipt={}
+
 async function submitNewPoll(e){
-    fd = new FormData($('#newPoll')[0]);
-    fd.append('req','createNewPoll');
-    fd.append('txhash',receipt.transactionHash)
-    callAjax(
-        AJAXURL,
-        fd,
-        (result)=>{
-            r = JSON.parse(result);
-            alert(r['message'])
-            if(r['result']){
-                $('#mypolls').click()
-            }else{
-                console.log('error occured');
-            }
-        }
-    )
     
+    fd = new FormData($('#newPoll')[0]);
+    
+    if(!fd.get('pollTitle')){ alert('Poll title is required'); return}
+    if(!fd.get('pollImage')){ alert('Poll image is required'); return}
+    if(!fd.get('option1') || !fd.get('option2')){ alert('Atleast 2 options are required'); return}
+
     $(e).attr('disabled','disabled');
-    $(e).text('Writing your poll data to blockchain');
-    if(typeof window.ethereum != 'undefined' && ethereum.isMetaMask){
+    $(e).text('Sign this transaction.');
+
+    web3Connection().then(async ()=>{
         userAccounts = await ethereum.request({method:'eth_requestAccounts'});
 
         if(typeof bbvs != 'undefined'){
-            data = bbvs.methods.newPoll('new poll',['1','1']).send({
-                from: ethereum.selectedAddress
-            }).then((receipt)=>{
-                treceipt = receipt;
+            var pollTitle = fd.get('pollTitle');
+            var pollOptions = [];
+            for (let index = 1; index <= 10; index++) {
+                if(!fd.get('option'+index)) break;
+
+                pollOptions.push(fd.get('option'+index));
+            }
+            //send data to blockchain
+            data = bbvs.methods.newPoll(pollTitle,pollOptions)
+            .send({ from: ethereum.selectedAddress })
+            .then(async (receipt)=>{
                 console.log(receipt);
+                $(e).text('Processing your request');
+                pid = await bbvs.methods.pollsCount().call();
+                
+                //Write poll data to server
+                fd.append('req','createNewPoll');
+                fd.append('txhash',receipt.transactionHash);
+                fd.append('pid',pid);
+                callAjax(
+                    AJAXURL,
+                    fd,
+                    (result)=>{
+                        r = JSON.parse(result);
+                        if(r['result']){
+                            alert(r['message'])
+                            $('#mypolls').click()
+                        }else{
+                            console.log(r);
+                        }
+                    }
+                )
             }).catch((err)=>{
-                console.log(err);
-                alert('internal error occured!');
+                if(err.code == 4001){
+                    alert('Transaction failed, user denied request.');
+                }else{
+                    console.log(err);
+                    alert('Internal error occured!');
+                }
             })
         }else{
             alert('Unable to establish connection with blockchain');
         }
         return;
-    }else{
-        alert('Install metamask extension to continue');
-    }
+    })
 }
 
-function modifyPoll(el, action,pid){
+async function modifyPoll(el, action, pid){
     payload = {
         req : 'modifyPoll',
         pid : pid,
         action : action
     };
-    if(action =='publish'){
-        period = $(el).prev().val();
+    const period = $(el).prev().val();
+    if(action == 'publish'){
         if(0 == period){
             alert('Invalid period selected');
             return
         }
         payload['period'] = period
+        web3Connection().then(()=>{
+            $(el).text('Sign this transaction.');
+            $(el).attr('disabled');
+    
+            bbvs.methods.startPoll($(el).attr('data-bpid'), period)
+            .send({from: ethereum.selectedAddress})
+            .then((receipt)=>{
+                payload['txhash'] = receipt.transactionHash;
+                
+                callAjax(
+                    AJAXURL,
+                    payload,
+                    (result)=>{
+                        r = JSON.parse(result);
+                        alert(r['message']);
+                        if(r['result']){
+                            $('#mypolls').click()
+                        }
+                    }
+                )
+            })
+            .catch(err=>{
+                alert('Transaction Failed or reverted!');
+                console.log(err);
+            })
+        })    
+    }else{
+        web3Connection().then(()=>{
+            $(el).text('Sign this transaction.');
+            $(el).attr('disabled');
+    
+            bbvs.methods.endPoll($(el).attr('data-bpid'))
+            .send({from: ethereum.selectedAddress})
+            .then((receipt)=>{
+                payload['txhash'] = receipt.transactionHash;
+                
+                callAjax(
+                    AJAXURL,
+                    payload,
+                    (result)=>{
+                        r = JSON.parse(result);
+                        alert(r['message']);
+                        if(r['result']){
+                            $('#mypolls').click()
+                        }
+                    }
+                )
+            })
+            .catch(err=>{
+                alert('Transaction Failed or reverted!');
+                console.log(err);
+            })
+        })
     }
-    callAjax(
-        AJAXURL,
-        payload,
-        (result)=>{
-            r = JSON.parse(result);
-            alert(r['message']);
-            if(r['result']){
-                $('#mypolls').click()
-            }
-        }
-    )
+
+    
 }
 
-function removePoll(e){
+function removePoll(e, userpoll = false){
     pid = $(e).attr('data-pid')
     if(pid > 0){
         if(confirm('Are you sure you want to remove this poll?')){
@@ -244,7 +308,10 @@ function removePoll(e){
                     r = JSON.parse(r)
                     if(r['result']){
                         alert(r['message'])
-                        $('button[data-pid='+pid+']').parent().parent().remove()
+                        if(userpoll)
+                            $('button[data-pid='+pid+']').parent().remove()
+                        else
+                            $('button[data-pid='+pid+']').parent().parent().remove()
                     }else{
                         alert(e['error'])
                     }

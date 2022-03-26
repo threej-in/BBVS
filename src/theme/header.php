@@ -12,7 +12,7 @@
 <html>
 <head>
   <title><?= $website['title'] ?></title>
-  <base href="<?php echo HOMEURI?>">
+  <base href="<?= HOMEURI ?>">
   <link rel="stylesheet" href="theme/style/brands.min.css">
   <link rel="stylesheet" href="theme/style/fontawesome.min.css">
   <link rel="stylesheet" href="theme/style/main.css">
@@ -76,13 +76,15 @@
             <img src="'.$pp.'" class="brad50" style="border:1px solid grey;" height="35px" width="35px" />'.$_SESSION['username'].'
           </a>
           <li class="dropdown">
-            <i class="fa fa-user fa-md" style="padding-right:5px"></i>
-            <a href="page/dashboard.php?show=profile">
-              Profile
-            </a><hr>
+            
             <i class="fa fa-poll fa-md" style="padding-right:5px"></i>
             <a href="page/dashboard.php?show=mypolls">
               My polls
+            </a><hr>
+            
+            <i class="fa fa-user fa-md" style="padding-right:5px"></i>
+            <a href="page/dashboard.php?show=profile">
+              Profile
             </a><hr>
             <i class="fa fa-sign-out-alt fa-sm" style="padding-right:5px"></i>
             <a href="page/logout.php">

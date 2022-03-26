@@ -24,15 +24,19 @@
             break;
             case 'createNewPoll':
                 if(!isset($_SESSION['UID'])) return;
-                $elements = ['Title','Description','Image'];
+                $elements = ['Title','Image'];
                 $error = '';
                 $result = false;
                 // print_r($_FILES);
-                foreach(array_reverse($elements) as $k => $el){
-                    if(empty($_POST['poll'.$el]) && empty($_FILES['poll'.$el])){
-                        $error = $el.' is required';
-                    }
+                if(empty($_POST['pollTitle'])){
+                    $error = 'Poll title is required!';
                 }
+                if($error == '' && empty($_POST['pollDescription'])) $_POST['pollDescription'] = $_POST['pollTitle'];
+
+                if($error == '' && empty($_FILES['pollImage'])){
+                    $error = 'Poll Image is required';
+                }
+                
                 if($error == '' && $_FILES['pollImage']['size'] > 500000){
                     $error = 'Image size is too large.';
                 }elseif($error == '' && !in_array($_FILES['pollImage']['type'],['image/jpeg','image/jpg','image/png'])){
@@ -55,6 +59,8 @@
                     }
                     $options = json_encode($options);
                     $voteCount = json_encode($voteCount);
+                    $_POST['pid'] = $_POST['pid'] ?? 0;
+                    $_POST['txhash'] = $_POST['txhash'] ?? '';
                     $values =[
                         [&$_POST['pollTitle'],'s'],
                         [&$_POST['pollDescription'],'s'],
@@ -62,9 +68,11 @@
                         [&$image,'s'],
                         [&$time,'i'],
                         [&$_SESSION['UID'],'i'],
-                        [&$voteCount,'s']
+                        [&$voteCount,'s'],
+                        [&$_POST['pid'],'i'],
+                        [&$_POST['txhash'],'s']
                     ];
-                    $t->query('INSERT INTO BBVSPOLLS(POLLNAME, DESCRIPTION, OPTIONS, POLLIMAGE,  CREATEDON, CREATEDBY, VOTECOUNT) VALUES(?,?,?,?,?,?,?)',$values);
+                    $t->query('INSERT INTO BBVSPOLLS(POLLNAME, DESCRIPTION, OPTIONS, POLLIMAGE,  CREATEDON, CREATEDBY, VOTECOUNT, BPID, TXHASH) VALUES(?,?,?,?,?,?,?,?,?)',$values);
                     if(false !== $t->execute()){
                         $result = true;
                         $error = 'Poll created successfully!';
@@ -84,12 +92,16 @@
             break;
             case 'modifyPoll':
                 if(!isset($_SESSION['UID'])) return;
+                $_POST['txhash'] = $_POST['txhash'] ?? '';
+
                 if($_POST['action'] == 'publish'){
                     if($_POST['period'] != 0){
                         $time = time();
-                        $t->query('UPDATE BBVSPOLLS SET STATUS = 1,PERIOD=?,STARTDATE = ? WHERE PID = ?',[
+                        $t->query("UPDATE BBVSPOLLS SET STATUS = 1,PERIOD=?,STARTDATE=?,TXHASH=(CASE WHEN ? = '' THEN TXHASH ELSE ? END) WHERE PID = ?",[
                             [&$_POST['period'],'i'],
                             [&$time,'i'],
+                            [&$_POST['txhash'],'s'],
+                            [&$_POST['txhash'],'s'],
                             [&$_POST['pid'],'i']
                         ]);
                         if(false != $t->execute()){
@@ -100,7 +112,9 @@
                         $message = 'Invalid period selected.';
                     }
                 }elseif($_POST['action'] == 'stop'){
-                    $t->query('UPDATE BBVSPOLLS SET STATUS = 0 WHERE PID = ?',[
+                    $t->query("UPDATE BBVSPOLLS SET STATUS = 0, TXHASH=(CASE WHEN ? = '' THEN TXHASH ELSE ? END) WHERE PID = ?",[
+                        [&$_POST['txhash'],'s'],
+                        [&$_POST['txhash'],'s'],
                         [&$_POST['pid'],'i']
                     ]);
                     if(false != $t->execute()){
@@ -138,7 +152,7 @@
                             <button data-no="2" onclick="n=$(this).attr('data-no');n++;$(this).before(`<input type='text' name='option${n}' placeholder='Option ${n}'>`);$(this).attr('data-no',n)" type="button" style="color: var(--dark);"><i class="fa fa-plus"></i> Add more option</button>
                             <p id="email_err" class="red sm"></p>
                         </section>
-                        <p class="red md"><?php echo $error ?? '' ?></p>
+                        <p class="red md"><?= $error ?? '' ?></p>
                         <button name="register" type="button" class="blue" onclick="submitNewPoll(this)">Create Poll</button>
                     </form>
                 </div>
@@ -198,12 +212,12 @@
                 while($r = $t->fetch()){
                 ?>
                     <tr>
-                        <td><?php echo $i++ ?></td>
+                        <td><?= $i++ ?></td>
                         <td>
-                            <?php echo '<h4>' .$r['POLLNAME'] .'</h4>
+                            <?= '<h4>' .$r['POLLNAME'] .'</h4>
                             <h6>' .$r['DESCRIPTION'] .'</h6>' ?>
                         </td>
-                        <td>@<?php echo $r['USERNAME'] ?></td>
+                        <td>@<?= $r['USERNAME'] ?></td>
                         <td>
                             <select name="status">
                                 <?php
@@ -217,11 +231,11 @@
 
                             </select>
                         </td>
-                        <td><?php echo $period[$r['PERIOD']] ?></td>
-                        <td><?php echo date('d M Y',$r['STARTDATE']) ?></td>
+                        <td><?= $period[$r['PERIOD']] ?></td>
+                        <td><?= date('d M Y',$r['STARTDATE']) ?></td>
                         <td>
-                            <button style="color: seagreen;" onclick="updatePoll(this)" data-pid="<?php echo $r['PID']?>">Update</button>
-                            <button onclick="removePoll(this)" data-pid="<?php echo $r['PID']?>">Remove</button>
+                            <button style="color: seagreen;" onclick="updatePoll(this)" data-pid="<?= $r['PID']?>">Update</button>
+                            <button onclick="removePoll(this)" data-pid="<?= $r['PID']?>">Remove</button>
                         </td>
                     </tr>
                     
@@ -239,7 +253,7 @@
                 <h2 style="color: var(--grey);">Profile settings</h2><hr>
                 <form action="page/dashboard.php" method="POST" enctype="multipart/form-data">
                     <section>
-                        <img data-id="profilepic" src="<?php echo empty($user['IMAGE']) ? 'theme/img/boy.jpg' : 'contents/img/profilepic/'.$user['IMAGE'] ?>" alt="" width="150px" height="150px">
+                        <img data-id="profilepic" src="<?= empty($user['IMAGE']) ? 'theme/img/boy.jpg' : 'contents/img/profilepic/'.$user['IMAGE'] ?>" alt="" width="150px" height="150px">
                         <div class="flexrow">
                             <label for="profileImage" style="border:1px solid grey;padding:10px 20px;border-radius:5px;width:fit-content;">Change image</label>
                             <input type="file" onchange="validateImage(this)" accept=".jpg,.png,.jpeg" name="profileImage" id="profileImage" style="display:none;">
@@ -249,17 +263,17 @@
                     </section>
                     <section>
                         <label for="fname">Name</label>
-                        <input name="fname" type="text" value="<?php echo $user['NAME']?>" onkeydown="return validateString(event.key,'!@')">
+                        <input name="fname" type="text" value="<?= $user['NAME']?>" onkeydown="return validateString(event.key,'!@')">
                         <p class="message"></p>
                     </section>
                     <section>
                         <label for="">Username</label>
-                        <input type="text" value="<?php echo $user['USERNAME']?>" disabled>
+                        <input type="text" value="<?= $user['USERNAME']?>" disabled>
                         <p class="message"></p>
                     </section>
                     <section>
                         <label for="">Email</label>
-                        <input type="text" value="<?php echo $user['EMAIL']?>" disabled>
+                        <input type="text" value="<?= $user['EMAIL']?>" disabled>
                         <p class="message"></p>
                     </section>
                     <section>
@@ -353,7 +367,7 @@
             break;
             case 'showPolls':
                 !isset($_SESSION['username']) ? die:'';
-                $t->query('SELECT * FROM BBVSPOLLS WHERE CREATEDBY = ?',[[&$_SESSION['UID'],'i']]);
+                $t->query('SELECT * FROM BBVSPOLLS WHERE CREATEDBY = ? ORDER BY CREATEDON DESC',[[&$_SESSION['UID'],'i']]);
                 if(false == $t->execute()){
                     echo '<p class="red">Unable to fetch polls</p>';
                     return;
@@ -407,10 +421,18 @@
                     input[type=radio]{
                         transform: scale(1.5);
                     }
+                    table.txdetails{
+                        border-collapse: collapse;
+                    }
+                    table.txdetails tr td{
+                        font-size: 13px;
+                        padding: 5px;
+                        border: 1px dotted grey;
+                    }
                 </style>
                 <div>
                     <div class="flexrow">
-                        <h3 style="color: var(--grey);">List of polls created by you</h3>
+                        <h3 style="color: var(--grey);">Polls created by you</h3>
                     </div>
                     <hr style="height: 20px;">
                     <div class="flexrow flexass active-polls">
@@ -421,17 +443,28 @@
                             while($r = $t->fetch()){ ?>
                                 <div class="flexcol individual-polls">
                                     <div class="flexcol flexass details">
-                                        <img src="contents/img/pollpic/<?php echo $r['POLLIMAGE'] ?>" alt="">
-                                        <?php echo $r['STATUS'] ? 
+                                        <img src="contents/img/pollpic/<?= $r['POLLIMAGE'] ?>" alt="">
+                                        <?= $r['STATUS'] ? 
                                         '<div class="status" style="background-color: seagreen;">Active</div>' : 
                                         '<div class="status" style="background-color: #d93939;">Not active</div>' ?>
                                         <div class="title">
-                                            <h3><?php echo $r['POLLNAME'] ?></h3>
-                                            <p class="sm"><?php echo $r['DESCRIPTION'] ?></p>
+                                            <h3><?= $r['POLLNAME'] ?></h3>
+                                            <p class="sm"><?= $r['DESCRIPTION'] ?></p>
                                         </div>
                                     </div>
                                     <div class="flexcol flexass options">
-                                        <p class="md" style="color:grey;">Choose your answer</p>
+                                        <table class="txdetails">
+                                            <tr>
+                                                <td>BPID</td>
+                                                <td><?= $r['BPID'] ?></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Last Tx Hash</td>
+                                                <td style="overflow-wrap: anywhere;"><?= $r['TXHASH'] ?></td>
+                                            </tr>
+                                        </table>
+                                        <hr>
+                                        <p class="md" style="color:grey;">Choices or Options</p>
                                         <?php
                                             $options = json_decode($r['OPTIONS']);
                                             foreach($options as $k => $v){
@@ -448,7 +481,7 @@
                                         $title = urlencode($r['POLLNAME']);
                                         echo '
                                         <button class="blue" style="width: 92%;" onclick="location.href=\'page/poll.php?title='.$title.'\'">Cast your vote &nbsp;<i class="fa fa-external-link-alt"></i></button>
-                                        <button onclick="modifyPoll(this,\'stop\', '.$r['PID'].')" style="color:white;background-color:#cd1f1f;margin: 0 0 20px 0;width: 92%;border:1px solid red;"><i class="fa fa-ban"></i> Stop Poll</button>';
+                                        <button onclick="modifyPoll(this,\'stop\', '.$r['PID'].')" data-bpid="'.$r['BPID'].'" style="color:white;background-color:#cd1f1f;margin: 0 0 20px 0;width: 92%;border:1px solid red;"><i class="fa fa-ban"></i> Stop Poll</button>';
                                     }else{
                                         echo '<select name="votingTime" id="" style="background-color: f1f1f1;width: 92%;">
                                             <option value="0">Select Voting period</option>
@@ -458,9 +491,10 @@
                                             <option value="21">Three Weeks</option>
                                             <option value="30">One Month</option>
                                         </select>
-                                        <button onclick="modifyPoll(this,\'publish\', '.$r['PID'].')" class="blue" style="margin: 0 0 20px 0;width: 92%;">Publish</button>';
+                                        <button onclick="modifyPoll(this,\'publish\', '.$r['PID'].')" data-bpid="'.$r['BPID'].'" class="blue" style="margin: 0 0 20px 0;width: 92%;">Publish</button>';
                                     }
                                     ?>
+                                    <button style="color:#cd1f1f;background-color:lightgrey;margin: 0 0 20px 0;width: 92%;border:1px solid red;" onclick="removePoll(this, true)" data-pid="<?= $r['PID']?>"><i class="fa fa-trash"></i> Delete Poll</button>
                                 </div>
                         <?php }} ?>
                     </div>
@@ -566,12 +600,12 @@
                         echo "<p class=\"md\">You haven't participated in any poll yet.</p>";
                     }else{
                         while($r = $t->fetch()){ ?>
-                            <div class="flexcol individual-polls" onclick="location.href='page/result.php?title=<?php echo urlencode($r['POLLNAME'])?>'">
+                            <div class="flexcol individual-polls" onclick="location.href='page/result.php?title=<?= urlencode($r['POLLNAME'])?>'">
                                 <div class="flexcol flexass details">
-                                    <img src="contents/img/pollpic/<?php echo $r['POLLIMAGE'] ?>" alt="">
+                                    <img src="contents/img/pollpic/<?= $r['POLLIMAGE'] ?>" alt="">
                                     <div class="title">
-                                        <h3><?php echo $r['POLLNAME'] ?></h3>
-                                        <p class="sm"><?php echo $r['DESCRIPTION'] ?></p>
+                                        <h3><?= $r['POLLNAME'] ?></h3>
+                                        <p class="sm"><?= $r['DESCRIPTION'] ?></p>
                                     </div>
                                 </div>
                                 <div class="flexcol flexass options" style="row-gap: 0.1em;">
@@ -751,9 +785,9 @@
                 while($r = $t->fetch()){
                 ?>
                     <tr>
-                        <td><?php echo $i++ ?></td>
-                        <td><?php echo $r['NAME'] ?></td>
-                        <td>@<?php echo $r['USERNAME'] ?></td>
+                        <td><?= $i++ ?></td>
+                        <td><?= $r['NAME'] ?></td>
+                        <td>@<?= $r['USERNAME'] ?></td>
                         <td>
                             <select name="status">
                                 <?php
@@ -780,10 +814,10 @@
 
                             </select>
                         </td>
-                        <td><?php echo date('d M Y',$r['REGDATE']) ?></td>
+                        <td><?= date('d M Y',$r['REGDATE']) ?></td>
                         <td>
-                            <button style="color: seagreen;" onclick="updateUser(this)" data-uid="<?php echo $r['UID']?>">Update</button>
-                            <button onclick="removeUser(this)" data-uid="<?php echo $r['UID']?>">Remove</button>
+                            <button style="color: seagreen;" onclick="updateUser(this)" data-uid="<?= $r['UID']?>">Update</button>
+                            <button onclick="removeUser(this)" data-uid="<?= $r['UID']?>">Remove</button>
                         </td>
                     </tr>
                     
