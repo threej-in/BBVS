@@ -505,7 +505,7 @@
             break;
             case 'showVotes':
                 !isset($_SESSION['username']) ? die:'';
-                $t->query('SELECT * FROM BBVSPOLLS WHERE PID IN (SELECT PID FROM BBVSVOTES WHERE UID = ?)',[[&$_SESSION['UID'],'i']]);
+                $t->query('SELECT B.*,V.TXHASH AS VTHASH FROM BBVSPOLLS AS B, BBVSVOTES AS V WHERE V.PID = B.PID AND V.UID = ?;',[[&$_SESSION['UID'],'i']]);
                 if(false == $t->execute()){
                     echo '<p class="red">Unable to fetch polls</p>';
                     return;
@@ -627,7 +627,8 @@
                                                 <span>'.$percentage.'%</span>
                                             </div>';
                                         }
-                                        echo '<hr><span class="sm"><i class="fa fa-clock"></i> Poll end date '.date('d M \a\t h:i a',$r['STARTDATE']).'</span>';
+                                        echo '<hr><span style="word-break:break-word;" class="sm">txhash: '.$r['VTHASH'].'</span>
+                                        <hr><span class="sm"><i class="fa fa-clock"></i> Poll end date '.date('d M \a\t h:i a',$r['STARTDATE']).'</span>';
                                     ?>
                                 </div>
                             </div>

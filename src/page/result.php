@@ -6,6 +6,14 @@
     $t->query('SELECT * FROM BBVSPOLLS WHERE POLLNAME LIKE ? LIMIT 1', [[&$title,'s']]);
     if(false != $t->execute()){
         $poll = $t->fetch();
+        if(isset($_GET['txhash'])){
+            $t->query('UPDATE BBVSVOTES SET TXHASH = ? WHERE UID = ? AND PID = ?',[
+                [&$_GET['txhash'],'s'],
+                [&$_SESSION['UID'],'i'],
+                [&$poll['PID'],'i']
+            ]);
+            $t->execute();
+        }
     }
 ?>
 <style>

@@ -86,7 +86,7 @@ if(false == $t->execute()){
         position: absolute;
         right: 0;
         font-size: 18px;
-        background-color: var(--white);
+        background-color: #ffffff29;
         padding: 0 10px;
     }
     label.md{
@@ -141,7 +141,7 @@ if(false == $t->execute()){
                         echo 
                         '<div class="flexrow option">
                             <label class="'.($votecount[$k] == $winner ? 'wn-option': 'gn-option').' md" style="width:'.$percentage.'%;">'.$v.'</label>
-                            <span>'.$percentage.'%</span>
+                            <span>'.number_format($percentage,2).'%</span>
                         </div>';
                     }
                     echo '<hr><span class="sm"><i class="fa fa-clock"></i> Poll end date '.date('d M \a\t h:i a',$r['STARTDATE'] + ($r['PERIOD'] * 86400)).'</span>
@@ -186,7 +186,7 @@ if(false == $t->execute()){
                             echo 
                             '<div class="flexrow option">
                                 <label class="'.($votecount[$k] == $winner ? 'wn-option': 'gn-option').' md" style="width:'.$percentage.'%;">'.$v.'</label>
-                                <span>'.$percentage.'%</span>
+                                <span>'.number_format($percentage,2).'%</span>
                             </div>';
                         }
                         echo '<hr><span class="sm"><i class="fa fa-clock"></i> Poll end date '.date('d M \a\t h:i a',$r['STARTDATE'] + ($r['PERIOD'] * 86400)).'</span>';

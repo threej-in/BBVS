@@ -1,0 +1,12 @@
+
+[11:46:02 - 14/Jan/2022] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'INSRT INTO BBVSUSERTABLE(NAME, USERNAME, EMAIL, PASSWORD, REGDATE) VALUES(?,?...' at line 1
+#0  threej->error() called at [D:\xampp\htdocs\bbvs\temp\src\class\db.php:41]
+#1  threejdb->query() called at [D:\xampp\htdocs\bbvs\temp\src\page\register.php:26]
+
+[11:57:27 - 14/Jan/2022] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'INSRT INTO BBVSUSERTABLE(NAME, USERNAME, EMAIL, PASSWORD, REGDATE) VALUES(?,?...' at line 1
+#0  threej->error() called at [D:\xampp\htdocs\bbvs\temp\src\class\db.php:41]
+#1  threejdb->query() called at [D:\xampp\htdocs\bbvs\temp\src\page\register.php:26]
+
+[11:58:20 - 14/Jan/2022] You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'INSRT INTO BBVSUSERTABLE(NAME, USERNAME, EMAIL, PASSWORD, REGDATE) VALUES(?,?...' at line 1
+#0  threej->error() called at [D:\xampp\htdocs\bbvs\temp\src\class\db.php:41]
+#1  threejdb->query() called at [D:\xampp\htdocs\bbvs\temp\src\page\register.php:26]

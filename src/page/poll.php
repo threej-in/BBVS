@@ -37,14 +37,15 @@
                                                 web3Connection().then(()=>{
                                                     bbvs.methods.vote(
                                                         <?= $data['BPID'] ?>,
-                                                        '<?= $user['EMAIL'] ?>',
+                                                        'w@w.w',
                                                         <?= $_POST['vote'] -1 ?>,
                                                         '<?= $_POST['securityAnswer'] ?>'
                                                     )
                                                     .send({from: ethereum.selectedAddress})
                                                     .then((receipt)=>{
                                                         $('#popup_img').attr('src','theme/img/greencheck.jpg')
-                                                        $('#popup_message').text("You have successfully casted your vote.");
+                                                        $('#popup_message').text("You have successfully casted your vote. Your tx hash is: "+receipt.transactionHash);
+                                                        $('#popup_btn').attr('href',"page/result.php?title=<?= $_POST['pollname'] ?>&txhash="+receipt.transactionHash);
                                                         $('#popup_btn').show();
                                                     })
                                                     .catch(err=>{
@@ -80,8 +81,8 @@
                                         <div class=\"popup-parent\">
                                             <div class=\"flexcol popup\">
                                                 <img id=\"popup_img\" src=\"theme/img/loading.gif\" width=\"250px\"><br>
-                                                <h3 id=\"popup_message\">Sign the transaction to confirm your vote.</h3>
-                                                <a href=\"page/result.php?title={$_POST['pollname']}\" id=\"popup_btn\" style=\"display:none;\"><button>Confirm</button></a>
+                                                <h3 id=\"popup_message\" style=\"word-break: break-word;\">Sign the transaction to confirm your vote.</h3>
+                                                <a href id=\"popup_btn\" style=\"display:none;\"><button>Confirm</button></a>
                                             </div>
                                         </div>";
                                         

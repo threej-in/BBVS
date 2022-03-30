@@ -1,7 +1,6 @@
 {
     "require": {
         "gregwar/captcha": "^1.1",
-        "phpmailer/phpmailer": "^6.6",
-        "web3p/web3.php": "^0.1.6"
+        "phpmailer/phpmailer": "^6.6"
     }
 }
