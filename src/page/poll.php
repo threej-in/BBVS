@@ -37,7 +37,7 @@
                                                 web3Connection().then(()=>{
                                                     bbvs.methods.vote(
                                                         <?= $data['BPID'] ?>,
-                                                        'w@w.w',
+                                                        '<?= $user['EMAIL'] ?>',
                                                         <?= $_POST['vote'] -1 ?>,
                                                         '<?= $_POST['securityAnswer'] ?>'
                                                     )

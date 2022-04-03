@@ -151,43 +151,6 @@ $( async () => {
 				{
 					"inputs": [
 						{
-							"internalType": "uint256",
-							"name": "_pid",
-							"type": "uint256"
-						}
-					],
-					"name": "getPollOptions",
-					"outputs": [
-						{
-							"internalType": "string[]",
-							"name": "options",
-							"type": "string[]"
-						},
-						{
-							"internalType": "uint64[]",
-							"name": "voteCount",
-							"type": "uint64[]"
-						}
-					],
-					"stateMutability": "view",
-					"type": "function"
-				},
-				{
-					"inputs": [],
-					"name": "newContractAddress",
-					"outputs": [
-						{
-							"internalType": "address",
-							"name": "",
-							"type": "address"
-						}
-					],
-					"stateMutability": "view",
-					"type": "function"
-				},
-				{
-					"inputs": [
-						{
 							"internalType": "string",
 							"name": "_title",
 							"type": "string"
@@ -207,71 +170,6 @@ $( async () => {
 						}
 					],
 					"stateMutability": "payable",
-					"type": "function"
-				},
-				{
-					"inputs": [],
-					"name": "owner",
-					"outputs": [
-						{
-							"internalType": "address",
-							"name": "",
-							"type": "address"
-						}
-					],
-					"stateMutability": "view",
-					"type": "function"
-				},
-				{
-					"inputs": [
-						{
-							"internalType": "uint256",
-							"name": "",
-							"type": "uint256"
-						}
-					],
-					"name": "polls",
-					"outputs": [
-						{
-							"internalType": "string",
-							"name": "title",
-							"type": "string"
-						},
-						{
-							"internalType": "address",
-							"name": "createdBy",
-							"type": "address"
-						},
-						{
-							"internalType": "enum BBVS.Status",
-							"name": "status",
-							"type": "uint8"
-						},
-						{
-							"internalType": "uint64",
-							"name": "time",
-							"type": "uint64"
-						},
-						{
-							"internalType": "uint16",
-							"name": "periodInDays",
-							"type": "uint16"
-						}
-					],
-					"stateMutability": "view",
-					"type": "function"
-				},
-				{
-					"inputs": [],
-					"name": "pollsCount",
-					"outputs": [
-						{
-							"internalType": "uint256",
-							"name": "",
-							"type": "uint256"
-						}
-					],
-					"stateMutability": "view",
 					"type": "function"
 				},
 				{
@@ -354,9 +252,111 @@ $( async () => {
 				{
 					"stateMutability": "payable",
 					"type": "receive"
+				},
+				{
+					"inputs": [
+						{
+							"internalType": "uint256",
+							"name": "_pid",
+							"type": "uint256"
+						}
+					],
+					"name": "getPollOptions",
+					"outputs": [
+						{
+							"internalType": "string[]",
+							"name": "options",
+							"type": "string[]"
+						},
+						{
+							"internalType": "uint64[]",
+							"name": "voteCount",
+							"type": "uint64[]"
+						}
+					],
+					"stateMutability": "view",
+					"type": "function"
+				},
+				{
+					"inputs": [],
+					"name": "newContractAddress",
+					"outputs": [
+						{
+							"internalType": "address",
+							"name": "",
+							"type": "address"
+						}
+					],
+					"stateMutability": "view",
+					"type": "function"
+				},
+				{
+					"inputs": [],
+					"name": "owner",
+					"outputs": [
+						{
+							"internalType": "address",
+							"name": "",
+							"type": "address"
+						}
+					],
+					"stateMutability": "view",
+					"type": "function"
+				},
+				{
+					"inputs": [
+						{
+							"internalType": "uint256",
+							"name": "",
+							"type": "uint256"
+						}
+					],
+					"name": "polls",
+					"outputs": [
+						{
+							"internalType": "string",
+							"name": "title",
+							"type": "string"
+						},
+						{
+							"internalType": "address",
+							"name": "createdBy",
+							"type": "address"
+						},
+						{
+							"internalType": "enum BBVS.Status",
+							"name": "status",
+							"type": "uint8"
+						},
+						{
+							"internalType": "uint64",
+							"name": "time",
+							"type": "uint64"
+						},
+						{
+							"internalType": "uint16",
+							"name": "periodInDays",
+							"type": "uint16"
+						}
+					],
+					"stateMutability": "view",
+					"type": "function"
+				},
+				{
+					"inputs": [],
+					"name": "pollsCount",
+					"outputs": [
+						{
+							"internalType": "uint256",
+							"name": "",
+							"type": "uint256"
+						}
+					],
+					"stateMutability": "view",
+					"type": "function"
 				}
-			];
-			const contractAddress = "0xeD25aDDa1Df09BD548C198c30c6460342aC88c6F";
+			]
+			const contractAddress = "0xB14C6Fb121DDA35D7f7C7d760DF0009e2B35Ada0";
 			const from = "0xFC43025223C4305db566f11c0b661AA4bAe1A668";
 			
 			web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
