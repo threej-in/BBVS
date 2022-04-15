@@ -326,19 +326,39 @@
                 $message = 'Failed to remove user';
             break;
             case 'removePoll':
-                if($_SESSION['role'] == USERROLE::ADMIN || $_SESSION['role'] == USERROLE::MODERATOR){
-                    $t->query('SELECT POLLIMAGE FROM BBVSPOLLS WHERE PID = ?',[[&$_POST['pid'],'i']]);
-                    if(false != $t->execute()){
-                        $polldata = $t->fetch();
+                $t->query('SELECT POLLIMAGE FROM BBVSPOLLS WHERE PID = ?',[[&$_POST['pid'],'i']]);
+                if(false != $t->execute()){
+                    $polldata = $t->fetch();
+                    if($_SESSION['role'] == USERROLE::ADMIN || $_SESSION['role'] == USERROLE::MODERATOR){
+                        $t->query('DELETE FROM BBVSVOTES WHERE PID = ?',[[&$_POST['pid'],'i']]);
+                        $t->execute();
                         $t->query('DELETE FROM BBVSPOLLS WHERE PID = ?',[[&$_POST['pid'],'i']]);
-                        if(false !== $t->execute() && $t->affected_rows == 1){
-                            unlink(ROOTDIR.'contents/img/pollpic/'.$polldata['POLLIMAGE']);
-                            echo json_encode([
-                                'result' => true,
-                                'message' => 'Poll removed'
-                            ]);
-                            return;
-                        }    
+                    }else{
+                        $t->query('DELETE FROM BBVSVOTES WHERE PID = SELECT PID FROM BBVSPOLLS WHERE PID = ? AND UID = ?',[[&$_POST['pid'],'i'],[&$_SESSION['UID']]]);
+                        $t->execute();
+                        $t->query('DELETE FROM BBVSPOLLS WHERE PID = ? AND CREATEDBY = ?',[[&$_POST['pid'],'i'],[&$_SESSION['UID'],'i']]);
+                    }
+                    if(false !== $t->execute() && $t->affected_rows == 1){
+                        unlink(ROOTDIR.'contents/img/pollpic/'.$polldata['POLLIMAGE']);
+                        echo json_encode([
+                            'result' => true,
+                            'message' => 'Poll removed'
+                        ]);
+                        return;
+                    }
+                }
+                $message = 'Failed to remove poll';
+            break;
+            case 'removeVote':
+                if(isset($_POST['uid']) && isset($_POST['pid']) && $_POST['uid'] == $_SESSION['UID']){
+                    
+                    $t->query('DELETE FROM BBVSVOTES WHERE PID = ? and UID = ?',[[&$_POST['pid'],'i'],[&$_POST['uid'],'i']]);
+                    if(false !== $t->execute() && $t->affected_rows == 1){
+                        echo json_encode([
+                            'result' => true,
+                            'message' => 'vote removed'
+                        ]);
+                        return;
                     }    
                 }
                 $message = 'Failed to remove poll';

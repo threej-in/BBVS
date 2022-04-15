@@ -356,11 +356,11 @@ $( async () => {
 					"type": "function"
 				}
 			]
-			const contractAddress = "0xB14C6Fb121DDA35D7f7C7d760DF0009e2B35Ada0";
+			const contractAddress = "0x6A249b353F1b7b9728a5Ac5324465273479b57B7";
 			const from = "0xFC43025223C4305db566f11c0b661AA4bAe1A668";
 			
 			web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
-			// web3.eth.handleRevert = true
+			web3.eth.handleRevert = true
 			bbvs = new web3.eth.Contract(abi, contractAddress);
 			
 			
@@ -376,7 +376,7 @@ $( async () => {
  * @returns boolean
  */
 async function web3Connection(){
-	const targetNetworkId = '0x539';
+	const targetNetworkId = '0x3';
 	if(typeof window.ethereum != 'undefined' && ethereum.isMetaMask){
 		if (ethereum.chainId != targetNetworkId) {
 			await ethereum.request({

@@ -169,7 +169,7 @@ async function submitNewPoll(e){
     if(!fd.get('pollImage')){ alert('Poll image is required'); return}
     if(!fd.get('option1') || !fd.get('option2')){ alert('Atleast 2 options are required'); return}
 
-    $(e).attr('disabled','disabled');
+    $(e).prop('disabled',true);
     $(e).text('Sign this transaction.');
 
     web3Connection().then(async ()=>{
@@ -209,6 +209,8 @@ async function submitNewPoll(e){
                     }
                 )
             }).catch((err)=>{
+                $(e).prop('disabled',false);
+                $(e).text('Retry.');
                 if(err.code == 4001){
                     alert('Transaction failed, user denied request.');
                 }else{
@@ -238,7 +240,7 @@ async function modifyPoll(el, action, pid){
         payload['period'] = period
         web3Connection().then(()=>{
             $(el).text('Sign this transaction.');
-            $(el).attr('disabled');
+            $(el).prop('disabled',true);
     
             bbvs.methods.startPoll($(el).attr('data-bpid'), period)
             .send({from: ethereum.selectedAddress})
@@ -258,6 +260,8 @@ async function modifyPoll(el, action, pid){
                 )
             })
             .catch(err=>{
+                $(el).prop('disabled',false);
+                $(el).text('Retry.');
                 alert('Transaction Failed or reverted!');
                 console.log(err);
             })
@@ -265,7 +269,7 @@ async function modifyPoll(el, action, pid){
     }else{
         web3Connection().then(()=>{
             $(el).text('Sign this transaction.');
-            $(el).attr('disabled');
+            $(el).prop('disabled',true);
     
             bbvs.methods.endPoll($(el).attr('data-bpid'))
             .send({from: ethereum.selectedAddress})
@@ -285,6 +289,8 @@ async function modifyPoll(el, action, pid){
                 )
             })
             .catch(err=>{
+                $(el).prop('disabled',false);
+                $(el).text('Retry.');
                 alert('Transaction Failed or reverted!');
                 console.log(err);
             })

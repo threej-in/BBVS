@@ -50,6 +50,14 @@
                                                     })
                                                     .catch(err=>{
                                                         alert('Transaction Failed or reverted!');
+                                                        $.ajax({
+                                                            url: 'ajax/user.php',
+                                                            type: "POST",
+                                                            data: {
+                                                            req: 'removeVote',
+                                                            uid: <?= $_SESSION['UID']?>,
+                                                            pid: <?= $data['PID']?>
+                                                        }})
                                                         console.log(err);
                                                     })
                                                 })
