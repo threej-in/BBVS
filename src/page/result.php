@@ -1,9 +1,8 @@
 <?php
     require __DIR__.'/../theme/header.php';
-    if(!isset($_SESSION['username'])) header('Location: login.php');
-    if(!isset($_GET['title'])) header('Location: ../index.php');
-    $title = urldecode($_GET['title']);
-    $t->query('SELECT * FROM BBVSPOLLS WHERE POLLNAME LIKE ? LIMIT 1', [[&$title,'s']]);
+    // if(!isset($_SESSION['username'])) header('Location: login.php');
+    if(!isset($_GET['title']) && !isset($_GET['pid'])) header('Location: ../index.php');
+    $t->query('SELECT * FROM BBVSPOLLS WHERE PID = ?', [[&$_GET['pid'],'i']]);
     if(false != $t->execute()){
         $poll = $t->fetch();
         if(isset($_GET['txhash'])){
@@ -213,7 +212,7 @@
         $t->query('SELECT * FROM BBVSPOLLS WHERE STATUS = 0 AND PERIOD > 0 AND PID <> ? ORDER BY STARTDATE DESC LIMIT 5',[[&$poll['PID'],'i']]);
         if(false != $t->execute()){
             while($poll = $t->fetch()){ 
-                echo '<div class="box" onclick="location.href=\'page/poll.php?title='.urlencode($poll['POLLNAME']).'\'">
+                echo '<div class="box" onclick="location.href=\'page/poll.php?pid='.$poll['PID'].'&title='.urlencode($poll['POLLNAME']).'\'">
                     <img class="opimg" src="contents/img/pollpic/'.$poll['POLLIMAGE'].'" alt="img">
                     <p class="quetion">'.$poll['POLLNAME'].'</p>
                 </div>';

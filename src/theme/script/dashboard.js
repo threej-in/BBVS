@@ -171,6 +171,9 @@ async function submitNewPoll(e){
 
     $(e).prop('disabled',true);
     $(e).text('Sign this transaction.');
+    setTimeout(() => {
+        $(el).after('<p class="red">Processing your request do not press back button.</p>');
+    }, 1000);
 
     web3Connection().then(async ()=>{
         userAccounts = await ethereum.request({method:'eth_requestAccounts'});
@@ -241,6 +244,9 @@ async function modifyPoll(el, action, pid){
         web3Connection().then(()=>{
             $(el).text('Sign this transaction.');
             $(el).prop('disabled',true);
+            setTimeout(() => {
+                $(el).after('<p class="red">Processing your request do not press back button.</p>');
+            }, 1000);
     
             bbvs.methods.startPoll($(el).attr('data-bpid'), period)
             .send({from: ethereum.selectedAddress})
@@ -270,7 +276,10 @@ async function modifyPoll(el, action, pid){
         web3Connection().then(()=>{
             $(el).text('Sign this transaction.');
             $(el).prop('disabled',true);
-    
+            setTimeout(() => {
+                $(el).after('<p class="red">Processing your request do not press back button.</p>');
+            }, 1000);
+
             bbvs.methods.endPoll($(el).attr('data-bpid'))
             .send({from: ethereum.selectedAddress})
             .then((receipt)=>{

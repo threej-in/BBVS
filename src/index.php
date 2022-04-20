@@ -116,7 +116,7 @@ if(false == $t->execute()){
 <div class="flexrow flexass active-polls">
     <?php while($r = $t->fetch()){
         ?>
-        <div class="flexcol individual-polls" onclick="location.href='page/poll.php?title=<?php echo urlencode($r['POLLNAME'])?>'">
+        <div class="flexcol individual-polls" onclick="location.href='page/poll.php?pid=<?= $r['PID'] ?>&title=<?php echo urlencode($r['POLLNAME'])?>'">
             <div class="flexcol flexass details">
                 <img src="contents/img/pollpic/<?php echo $r['POLLIMAGE'] ?>" alt="">
                 <div class="title">
@@ -146,7 +146,7 @@ if(false == $t->execute()){
                     }
                     echo '<hr><span class="sm"><i class="fa fa-clock"></i> Poll end date '.date('d M \a\t h:i a',$r['STARTDATE'] + ($r['PERIOD'] * 86400)).'</span>
                     <button class="blue"><i class="fa fa-poll"></i> Vote</button>
-                    <button class="blue" onclick="event.stopPropagation();location.href=\'page/result.php?title='.urlencode($r['POLLNAME']).'\';"><i class="fa fa-eye"></i> Result</button>';  
+                    <button class="blue" onclick="event.stopPropagation();location.href=\'page/result.php?pid='.$r['PID'].'&title='.urlencode($r['POLLNAME']).'\';"><i class="fa fa-eye"></i> Result</button>';  
                 ?>
             </div>
         </div>
@@ -162,7 +162,7 @@ if(false == $t->execute()){
     $t->query('SELECT * FROM BBVSPOLLS WHERE STATUS = 0 AND PERIOD > 0 AND STARTDATE > 0 ORDER BY STARTDATE DESC');
     if(false != $t->execute()){
         while($r = $t->fetch()){ ?>
-            <div class="flexcol individual-polls" onclick="location.href='page/result.php?title=<?php echo urlencode($r['POLLNAME'])?>'">
+            <div class="flexcol individual-polls" onclick="location.href='page/result.php?pid=<?= $r['PID']?>&title=<?php echo urlencode($r['POLLNAME'])?>'">
                 <div class="flexcol flexass details">
                     <img src="contents/img/pollpic/<?php echo $r['POLLIMAGE'] ?>" alt="">
                     <div class="title">

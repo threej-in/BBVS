@@ -362,8 +362,6 @@ $( async () => {
 			web3 = new Web3(Web3.givenProvider || "http://localhost:8545");
 			web3.eth.handleRevert = true
 			bbvs = new web3.eth.Contract(abi, contractAddress);
-			
-			
 		} catch (error) {
 			console.log(error);
 		}
@@ -376,12 +374,15 @@ $( async () => {
  * @returns boolean
  */
 async function web3Connection(){
-	const targetNetworkId = '0x3';
+	//kovan test network
+	const targetNetworkId = '0x2a';
 	if(typeof window.ethereum != 'undefined' && ethereum.isMetaMask){
 		if (ethereum.chainId != targetNetworkId) {
 			await ethereum.request({
 				method: 'wallet_switchEthereumChain',
     			params: [{ chainId: targetNetworkId }],
+			}).catch(()=>{
+				alert('Unknown network is selected. Please allow to switch network & retry your last action after refreshing the page.')
 			})
 		}
 		return true;

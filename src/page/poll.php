@@ -45,7 +45,7 @@
                                                     .then((receipt)=>{
                                                         $('#popup_img').attr('src','theme/img/greencheck.jpg')
                                                         $('#popup_message').text("You have successfully casted your vote. Your tx hash is: "+receipt.transactionHash);
-                                                        $('#popup_btn').attr('href',"page/result.php?title=<?= $_POST['pollname'] ?>&txhash="+receipt.transactionHash);
+                                                        $('#popup_btn').attr('href',"page/result.php?pid=<?= $_POST['pollid'] ?>&title=<?= $_POST['pollname'] ?>&txhash="+receipt.transactionHash);
                                                         $('#popup_btn').show();
                                                     })
                                                     .catch(err=>{
@@ -59,6 +59,7 @@
                                                             pid: <?= $data['PID']?>
                                                         }})
                                                         console.log(err);
+                                                        location.href="index.php";
                                                     })
                                                 })
                                             })
@@ -118,16 +119,16 @@
         }
         
     }
-    if(!isset($_GET['title'])){header('Location: ../index.php');return;}
+    if(!isset($_GET['title']) && !isset($_GET['pid'])){header('Location: ../index.php');return;}
 
     $title = urldecode($_GET['title']);
-    $t->query('SELECT a.*, b.SECURITYQUESTION FROM BBVSPOLLS AS a, BBVSUSERTABLE AS b WHERE a.POLLNAME LIKE ? AND b.UID = ? LIMIT 1', [[&$title,'s'],[&$_SESSION['UID'],'i']]);
+    $t->query('SELECT a.*, b.SECURITYQUESTION FROM BBVSPOLLS AS a, BBVSUSERTABLE AS b WHERE a.POLLNAME LIKE ? AND A.PID = ? AND b.UID = ? LIMIT 1', [[&$title,'s'],[&$_GET['pid'],'i'],[&$_SESSION['UID'],'i']]);
     if(false != $t->execute() && $t->affected_rows == 1){
         $poll = $t->fetch();
     }else{
         header('Location: ../index.php');
     }
-    if($poll['STATUS'] === 0) header('Location: result.php?title='.$_GET['title']);
+    if($poll['STATUS'] === 0) header('Location: result.php?pid='.$poll['PID'].'&title='.$_GET['title']);
     $pid = $poll['PID'];
 ?>
 <style>
@@ -281,7 +282,7 @@
 </div>
 <div class="flexrow flexass">
     
-    <form method="POST" action="page/poll.php?title=<?php echo urlencode($poll['POLLNAME']) ?>">
+    <form method="POST" action="page/poll.php?pid=<?= $poll['PID']?>&title=<?php echo urlencode($poll['POLLNAME']) ?>">
         <div class="poll">
             <div class="banner">
                 <img class="opimg" src="contents/img/pollpic/<?php echo $poll['POLLIMAGE'] ?>" alt="img">
@@ -324,7 +325,7 @@
         $t->query('SELECT * FROM BBVSPOLLS WHERE STATUS = 1 AND PID <> ? ORDER BY STARTDATE DESC LIMIT 5',[[&$poll['PID'],'i']]);
         if(false != $t->execute()){
             while($poll = $t->fetch()){ 
-                echo '<div class="box" onclick="location.href=\'page/poll.php?title='.urlencode($poll['POLLNAME']).'\'">
+                echo '<div class="box" onclick="location.href=\'page/poll.php?pid='.$poll['PID'].'&title='.urlencode($poll['POLLNAME']).'\'">
                     <img class="opimg" src="contents/img/pollpic/'.$poll['POLLIMAGE'].'" alt="img">
                     <p class="quetion">'.$poll['POLLNAME'].'</p>
                 </div>';
